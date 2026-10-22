@@ -86,7 +86,7 @@ mistake it prevents is expensive to find later.
 9. **Check your work.** After saving, read the transaction back (and the balance or report it
    changes) and tell the user the result and where to see it in SerieX. SerieX windows that
    are already open do not refresh by themselves: tell the user to reopen the window or
-   reload (F5 on Windows, Cmd+R on a Mac) to see your change.
+   reload (F5 on Windows and Linux, Cmd+R on a Mac) to see your change.
 10. **Stay in your lane on tax.** Explain what SerieX shows; for tax positions, depreciation,
     how owners get paid and filing, suggest an accountant. SerieX Payroll prepares forms but
     does not file or pay them, and it never moves money.

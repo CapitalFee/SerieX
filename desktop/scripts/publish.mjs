@@ -10,10 +10,12 @@
 // changes to tracked files) and must already be on origin/main, and the installers must have been
 // built after it was made.
 //
-// Steps: (a) check the commit, (b) check the five installers, the two extension packages
-// (seriex-<version>-darwin-universal.mcpb and -windows-amd64.mcpb, with dist/mcp/server.json naming
-// their download addresses and SHA-256), the SerieX skill for AI assistants (dist/seriex.skill,
-// which must hold exactly the skills/seriex folder of the commit) and the install scripts, (c)
+// Steps: (a) check the commit, (b) check the installers (five for Mac and Windows, and the two
+// Ubuntu packages SerieX-linux-amd64.deb and -arm64.deb: their version, processor and contents,
+// read with the macOS tar), the two extension packages (seriex-<version>-darwin-universal.mcpb
+// and -windows-amd64.mcpb, with dist/mcp/server.json naming their download addresses and
+// SHA-256), the SerieX skill for AI assistants (dist/seriex.skill, which must hold exactly the
+// skills/seriex folder of the commit) and the install scripts, (c)
 // write dist/SHA256SUMS, (d) create the release and its tag on the commit (or, when the release
 // already exists on the same commit, upload its files again) with the installers, the extension
 // packages, the skill, SHA256SUMS and both install scripts as its files, and mark it as the latest
@@ -32,7 +34,9 @@ import { fileURLToPath } from 'node:url';
 const REPO = 'CapitalFee/SerieX';
 const BRANCH = 'main';
 const DOWNLOAD = `https://github.com/${REPO}/releases/latest/download`;
-const INSTALLERS = ['SerieX-mac-arm64.zip', 'SerieX-mac-x64.zip', 'SerieX-mac-arm64.dmg', 'SerieX-mac-x64.dmg', 'SerieX-Setup-x64.exe'];
+// the Ubuntu packages (scripts/build.mjs packageLinux; release/install.sh downloads them by name)
+const LINUX_DEBS = ['SerieX-linux-amd64.deb', 'SerieX-linux-arm64.deb'];
+const INSTALLERS = ['SerieX-mac-arm64.zip', 'SerieX-mac-x64.zip', 'SerieX-mac-arm64.dmg', 'SerieX-mac-x64.dmg', 'SerieX-Setup-x64.exe', ...LINUX_DEBS];
 const SCRIPTS = ['install.sh', 'install.ps1'];
 
 const desktop = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -116,6 +120,109 @@ function tagCommit(name) {
   return '';
 }
 
+// ---- Ubuntu packages ----
+
+const DEB_PACKAGE = 'seriex'; // deb.packageName in scripts/build.mjs
+const ELF_MACHINE = { amd64: 0x3e, arm64: 0xb7 }; // the processor field of a Linux program
+const DEB_PROGRAMS = ['opt/SerieX/seriex', ...['seriex-books', 'seriex-payroll', 'seriex-mcp'].map((n) => `opt/SerieX/resources/servers/${n}`)];
+const DEB_FILES = [
+  ...DEB_PROGRAMS,
+  'opt/SerieX/chrome-sandbox',
+  'opt/SerieX/resources/app.asar',
+  'opt/SerieX/resources/apparmor-profile',
+  'opt/SerieX/resources/LICENSE',
+  'opt/SerieX/resources/THIRD_PARTY_NOTICES.txt',
+  'opt/SerieX/resources/icon.png',
+  'opt/SerieX/resources/books-web/index.html',
+  'opt/SerieX/resources/payroll-web/index.html',
+  'usr/share/applications/seriex.desktop',
+  'usr/share/icons/hicolor/512x512/apps/seriex.png',
+];
+const DESKTOP_ENTRY = ['Exec=/opt/SerieX/seriex %U', 'Icon=seriex', 'StartupWMClass=seriex'];
+
+/** Lists a tar archive with the macOS tar (bsdtar, which also reads the .deb format): { names, long }. */
+function tarList(file, label) {
+  const r = run('/usr/bin/tar', ['-tvf', file], { quiet: true });
+  const short = run('/usr/bin/tar', ['-tf', file], { quiet: true });
+  if (r.status !== 0 || short.status !== 0) fail(`could not read ${label} with tar.`);
+  return { names: short.stdout.split('\n').filter(Boolean), long: r.stdout.split('\n').filter(Boolean) };
+}
+
+/** Checks dist/<f> (SerieX-linux-<amd64|arm64>.deb), unpacking what it needs into a folder of tmp. */
+function checkDeb(f, tmp) {
+  if (process.platform !== 'darwin') fail('check the Ubuntu packages on a Mac: the check reads them with the macOS tar.');
+  const file = path.join(dist, f);
+  const arch = /^SerieX-linux-(amd64|arm64)\.deb$/.exec(f)[1];
+  const head = Buffer.alloc(8);
+  const fd = fs.openSync(file, 'r');
+  try {
+    fs.readSync(fd, head, 0, 8, 0);
+  } finally {
+    fs.closeSync(fd);
+  }
+  if (head.toString('latin1') !== '!<arch>\n') fail(`dist/${f} is not a Debian package.`);
+  const members = tarList(file, `dist/${f}`).names;
+  const control = members.find((n) => /^control\.tar\.(gz|xz|zst)$/.test(n));
+  const data = members.find((n) => /^data\.tar\.(gz|xz|zst)$/.test(n));
+  if (!members.includes('debian-binary') || !control || !data) fail(`dist/${f} does not hold debian-binary, control.tar and data.tar.`);
+  const dir = fs.mkdtempSync(path.join(tmp, `${arch}-`));
+  if (run('/usr/bin/tar', ['-xf', file, '-C', dir, control, data], { quiet: true }).status !== 0) fail(`could not unpack dist/${f}.`);
+  const plain = (n) => n.replace(/^\.\//, '');
+
+  // the package fields (./control)
+  const controlTar = path.join(dir, control);
+  const controlName = tarList(controlTar, `${control} in dist/${f}`).names.find((n) => plain(n) === 'control');
+  if (!controlName) fail(`${control} in dist/${f} has no control file.`);
+  const fields = {};
+  for (const line of run('/usr/bin/tar', ['-xOf', controlTar, controlName], { quiet: true }).stdout.split('\n')) {
+    const m = /^([A-Za-z-]+):\s*(.*)$/.exec(line);
+    if (m) fields[m[1]] = m[2].trim();
+  }
+  if (fields.Package !== DEB_PACKAGE) fail(`dist/${f} is the package ${fields.Package || '(none)'}, not ${DEB_PACKAGE}.`);
+  if (fields.Version !== version) fail(`dist/${f} contains SerieX ${fields.Version || '(no version)'}, not ${version}. Run "npm run build:all" first.`);
+  if (fields.Architecture !== arch) fail(`dist/${f} is for ${fields.Architecture || '(no processor)'}, not ${arch}.`);
+
+  // the files it installs
+  const dataTar = path.join(dir, data);
+  const listing = tarList(dataTar, `${data} in dist/${f}`);
+  const byPlain = new Map(listing.names.map((n) => [plain(n), n]));
+  const missing = DEB_FILES.filter((n) => !byPlain.has(n));
+  if (missing.length) fail(`dist/${f} does not install ${missing.map((n) => `/${n}`).join(', ')}.`);
+  // every file must belong to root (user and group 0): Ubuntu installs them with the owner the package records
+  const owners = run('/usr/bin/tar', ['--numeric-owner', '-tvf', dataTar], { quiet: true });
+  if (owners.status !== 0) fail(`could not read the owners in ${data} of dist/${f}.`);
+  const notRoot = owners.stdout.split('\n').filter(Boolean).filter((l) => {
+    const p = l.trim().split(/\s+/);
+    return p[2] !== '0' || p[3] !== '0';
+  });
+  if (notRoot.length) fail(`dist/${f} has ${notRoot.length} files not owned by root, for example: ${notRoot[0].trim()}`);
+  for (const n of DEB_PROGRAMS) {
+    const line = listing.long.find((l) => l.endsWith(` ${byPlain.get(n)}`));
+    if (!line || !/^-..x..x..x/.test(line)) fail(`/${n} in dist/${f} cannot be run (its mode is not 755).`);
+  }
+  const out = path.join(dir, 'files');
+  fs.mkdirSync(out);
+  const wanted = [...DEB_PROGRAMS, 'usr/share/applications/seriex.desktop'].map((n) => byPlain.get(n));
+  if (run('/usr/bin/tar', ['-xf', dataTar, '-C', out, ...wanted], { quiet: true }).status !== 0) fail(`could not unpack the programs of dist/${f}.`);
+  for (const n of DEB_PROGRAMS) {
+    const elf = Buffer.alloc(20);
+    const pfd = fs.openSync(path.join(out, n), 'r');
+    try {
+      fs.readSync(pfd, elf, 0, 20, 0);
+    } finally {
+      fs.closeSync(pfd);
+    }
+    const isElf64 = elf[0] === 0x7f && elf.toString('latin1', 1, 4) === 'ELF' && elf[4] === 2;
+    if (!isElf64 || elf.readUInt16LE(18) !== ELF_MACHINE[arch]) fail(`/${n} in dist/${f} is not a 64-bit Linux program for ${arch}.`);
+  }
+  const entry = fs.readFileSync(path.join(out, 'usr/share/applications/seriex.desktop'), 'utf8').split('\n').map((l) => l.trim());
+  for (const want of DESKTOP_ENTRY) {
+    if (!entry.includes(want)) fail(`the menu entry seriex.desktop in dist/${f} does not have ${want}.`);
+  }
+  fs.rmSync(dir, { recursive: true, force: true });
+  console.log(`${f}: ${DEB_PACKAGE} ${fields.Version} for ${arch}, ${DEB_FILES.length} files checked`);
+}
+
 // ---- arguments ----
 function usage(message) {
   console.error(`publish stopped: ${message}\n`);
@@ -173,12 +280,28 @@ for (const f of [...MCPB, 'server.json']) {
 for (const f of SCRIPTS) {
   if (!fs.existsSync(path.join(releaseDir, f))) fail(`release/${f} is missing.`);
 }
+// install.sh is shared by every Mac and Ubuntu user: it must parse, and it must know the Ubuntu packages.
+{
+  const script = path.join(releaseDir, 'install.sh');
+  const parsed = run('bash', ['-n', script], { quiet: true }).status === 0;
+  if (!parsed || !fs.readFileSync(script, 'utf8').includes('SerieX-linux-')) fail('release/install.sh cannot install the Ubuntu packages.');
+}
 // The app inside each ZIP must be this version (a ZIP left by an older build would not be).
 for (const f of INSTALLERS.filter((n) => n.endsWith('.zip'))) {
   const plist = spawnSync('unzip', ['-p', path.join(dist, f), 'SerieX.app/Contents/Info.plist'], { maxBuffer: 16 * 1024 * 1024 });
   const m = plist.status === 0 && /<key>CFBundleShortVersionString<\/key>\s*<string>([^<]+)<\/string>/.exec(plist.stdout.toString('utf8'));
   if (!m) fail(`could not read the app version inside dist/${f}`);
   if (m[1] !== version) fail(`dist/${f} contains SerieX ${m[1]}, not ${version}. Run "npm run build:all" first.`);
+}
+// Each Ubuntu package must be this version, for its processor, and hold SerieX, its servers, the
+// AppArmor rule (without it SerieX does not open on Ubuntu 24.04), the license files, the icon and
+// the menu entry.
+const debTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'seriex-deb-'));
+process.on('exit', () => fs.rmSync(debTmp, { recursive: true, force: true })); // fail() exits at once
+try {
+  for (const f of LINUX_DEBS) checkDeb(f, debTmp);
+} finally {
+  fs.rmSync(debTmp, { recursive: true, force: true });
 }
 // Each extension package must be this version, and the Mac one must run on Apple silicon and Intel.
 const mcpbTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'seriex-mcpb-'));
@@ -283,26 +406,36 @@ curl -fsSL ${DOWNLOAD}/install.sh | bash
 irm ${DOWNLOAD}/install.ps1 | iex
 \`\`\`
 
-The command downloads SerieX, checks it against SHA256SUMS, installs it for you and opens it. Run the same command again to update. No administrator password is needed.
+**Ubuntu 22.04 or later** (open Terminal with Ctrl+Alt+T and paste):
+
+\`\`\`
+wget -qO- ${DOWNLOAD}/install.sh | bash
+\`\`\`
+
+The command downloads SerieX, checks it against SHA256SUMS, installs it for you and opens it. Run the same command again to update. On a Mac and on Windows no administrator password is needed. On Ubuntu the command asks for your password once, because Ubuntu's app installer needs it.
 
 ## Or download the installer
 
 - Mac with Apple silicon (M1 or later): **SerieX-mac-arm64.dmg**
 - Mac with an Intel processor: **SerieX-mac-x64.dmg**
 - Windows (64-bit): **SerieX-Setup-x64.exe**
+- Ubuntu, 64-bit Intel or AMD (most PCs): **SerieX-linux-amd64.deb**
+- Ubuntu on a 64-bit ARM processor: **SerieX-linux-arm64.deb**
 
 These installers are not signed by Apple or Microsoft, so the first time you open SerieX your computer shows a warning. You only need to get past it once:
 
 - **Mac:** open the DMG and drag SerieX to Applications. In Applications, right-click (or Control-click) SerieX, choose **Open**, then click **Open** again. If your Mac only offers **Done** or **Move to Trash**, click **Done**, open **System Settings > Privacy & Security**, and click **Open Anyway** next to SerieX.
 - **Windows:** when the blue "Windows protected your PC" window appears, click **More info**, then **Run anyway**.
 
+On Ubuntu there is no warning. Install the downloaded file in Terminal with \`sudo apt install ~/Downloads/SerieX-linux-amd64.deb\` (on an ARM computer, use the arm64 file). A note that the download is "performed unsandboxed" is normal.
+
 The install commands above do not show this warning.
 
 ## Use SerieX with an AI assistant (optional)
 
-In SerieX, click **AI Assistants** in the left sidebar, turn on sharing for the company file, and click **Set up Claude for me** or **Set up ChatGPT for me**. SerieX must be open while you use the assistant.
+In SerieX, click **AI Assistants** in the left sidebar, turn on sharing for the company file, and click **Set up Claude for me** or **Set up ChatGPT for me**. SerieX must be open while you use the assistant. On Ubuntu, use Claude Code or Codex; the AI Assistants window shows how.
 
-For Claude Desktop you can install the SerieX extension instead of clicking **Set up Claude for me**: download **${MCPB_MAC}** (Mac) or **${MCPB_WIN}** (Windows) and open it with Claude Desktop. The company file must still be shared under **AI Assistants** in the left sidebar.
+For Claude Desktop on a Mac or on Windows you can install the SerieX extension instead of clicking **Set up Claude for me**: download **${MCPB_MAC}** (Mac) or **${MCPB_WIN}** (Windows) and open it with Claude Desktop. The company file must still be shared under **AI Assistants** in the left sidebar.
 
 **${SKILL}** is the SerieX skill: instructions that teach an assistant how to work in SerieX. Upload it in Claude under **Customize > Skills**, or unzip it into \`~/.claude/skills\` (Claude Code) or \`~/.agents/skills\` (Codex). [How to use it](https://github.com/${REPO}/blob/${BRANCH}/docs/user-guide.md#use-the-seriex-skill)
 
@@ -310,11 +443,13 @@ For Claude Desktop you can install the SerieX extension instead of clicking **Se
 
 - Mac: \`~/Library/Application Support/SerieX\`
 - Windows: \`%APPDATA%\\SerieX\`
+- Ubuntu: \`~/.config/SerieX\`
 
 Updating or uninstalling SerieX keeps your company files. To remove the app:
 
 - Mac: drag SerieX from Applications to the Trash, or run \`curl -fsSL ${DOWNLOAD}/install.sh | bash -s -- --uninstall\`
 - Windows: Settings > Apps > Installed apps > SerieX > Uninstall
+- Ubuntu: run \`wget -qO- ${DOWNLOAD}/install.sh | bash -s -- --uninstall\`, or \`sudo apt remove seriex\`
 
 ## Source code
 
@@ -398,3 +533,4 @@ console.log(`\nPublished ${rel.url} (tag ${tag} on ${short})`);
 console.log(`The extension packages are on the release: dist/mcp/server.json can now be published with mcp-publisher.`);
 console.log(`  Mac:     curl -fsSL ${DOWNLOAD}/install.sh | bash`);
 console.log(`  Windows: irm ${DOWNLOAD}/install.ps1 | iex`);
+console.log(`  Ubuntu:  wget -qO- ${DOWNLOAD}/install.sh | bash`);

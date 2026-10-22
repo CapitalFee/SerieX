@@ -8,7 +8,7 @@ SerieX is open-source accounting software that you install like any other progra
 
 ## Install
 
-SerieX runs on macOS 13 (Ventura) or later, and on Windows 10 or 11 (64-bit). You do not need an administrator password.
+SerieX runs on macOS 13 (Ventura) or later, Windows 10 or 11 (64-bit), and Ubuntu 22.04 or later (64-bit). On a Mac and on Windows you do not need an administrator password. On Ubuntu, the install asks for your password once.
 
 ### Mac
 
@@ -28,7 +28,18 @@ curl -fsSL https://github.com/CapitalFee/SerieX/releases/latest/download/install
 irm https://github.com/CapitalFee/SerieX/releases/latest/download/install.ps1 | iex
 ```
 
-SerieX opens when the install is done. The command downloads the latest release of SerieX, checks that the download is complete and undamaged, and installs it. It also removes the mark your computer puts on files downloaded from the internet, so you do not see the usual warning. Only run it if you trust this project. [What the install command does](docs/user-guide.md#what-the-install-command-does) has the details.
+### Ubuntu
+
+1. Open **Terminal**: press **Ctrl+Alt+T**.
+2. Paste this line with **Ctrl+Shift+V** and press **Enter**:
+
+```bash
+wget -qO- https://github.com/CapitalFee/SerieX/releases/latest/download/install.sh | bash
+```
+
+3. When it asks, type your password (the one you use to log in) and press **Enter**. You may not see anything while you type; that is normal. Ubuntu needs it to install apps.
+
+SerieX opens when the install is done. The command downloads the latest release of SerieX, checks that the download is complete and undamaged, and installs it. On a Mac and on Windows, it also removes the mark your computer puts on files downloaded from the internet, so you do not see the usual warning. On Ubuntu, it installs SerieX with Ubuntu's own app installer, which also adds anything SerieX needs. Only run it if you trust this project. [What the install command does](docs/user-guide.md#what-the-install-command-does) has the details.
 
 **To update,** run the same command again. It closes SerieX, so save your work first. Your company files are kept.
 
@@ -41,6 +52,8 @@ The command above is the easiest way. If you would rather use an installer file,
 | Mac with Apple silicon (M1 or later) | [`SerieX-mac-arm64.dmg`](https://github.com/CapitalFee/SerieX/releases/latest/download/SerieX-mac-arm64.dmg) |
 | Mac with an Intel processor | [`SerieX-mac-x64.dmg`](https://github.com/CapitalFee/SerieX/releases/latest/download/SerieX-mac-x64.dmg) |
 | Windows, 64-bit | [`SerieX-Setup-x64.exe`](https://github.com/CapitalFee/SerieX/releases/latest/download/SerieX-Setup-x64.exe) |
+| Ubuntu, 64-bit Intel or AMD (most PCs) | [`SerieX-linux-amd64.deb`](https://github.com/CapitalFee/SerieX/releases/latest/download/SerieX-linux-amd64.deb) |
+| Ubuntu, 64-bit ARM | [`SerieX-linux-arm64.deb`](https://github.com/CapitalFee/SerieX/releases/latest/download/SerieX-linux-arm64.deb) |
 
 **Not sure which Mac you have?** Open the Apple menu and choose **About This Mac**. "Chip: Apple M…" means Apple silicon. "Processor: … Intel …" means an Intel Mac.
 
@@ -48,6 +61,8 @@ These files are not signed with a developer certificate, which is how your compu
 
 - **Mac:** open the `.dmg` file and drag SerieX to **Applications**. In **Applications**, right-click (or Control-click) SerieX, choose **Open**, then click **Open** again. If your Mac only offers **Done** or **Move to Trash**, click **Done**, open **System Settings > Privacy & Security** and click **Open Anyway** next to SerieX.
 - **Windows:** run the file. When the blue "Windows protected your PC" window appears, click **More info**, then **Run anyway**.
+
+On Ubuntu there is no warning. Install the downloaded file in Terminal with `sudo apt install ~/Downloads/SerieX-linux-amd64.deb` (on an ARM computer, use the arm64 file). A note that the download is "performed unsandboxed" is normal.
 
 To update, download the new file and install it the same way.
 
@@ -110,7 +125,7 @@ SerieX Payroll does not move money. It records direct deposit details, but it do
 ### Also included
 
 - **One desktop app** for both, which works without an internet connection.
-- **AI assistants (optional):** let an AI assistant app on your computer, such as the Claude or ChatGPT desktop app, read your books and answer questions like "Which customers are overdue?". It stays off until a SerieX administrator turns it on under **AI Assistants** in the left sidebar, and it can only look unless that administrator also allows changes. [More about AI assistants](docs/user-guide.md#ai-assistants). A free skill also teaches assistants how to work in SerieX: [install the SerieX skill](docs/user-guide.md#use-the-seriex-skill).
+- **AI assistants (optional):** let an AI assistant app on your computer, such as the Claude or ChatGPT desktop app, Claude Code or Codex, read your books and answer questions like "Which customers are overdue?". It stays off until a SerieX administrator turns it on under **AI Assistants** in the left sidebar, and it can only look unless that administrator also allows changes. [More about AI assistants](docs/user-guide.md#ai-assistants). A free skill also teaches assistants how to work in SerieX: [install the SerieX skill](docs/user-guide.md#use-the-seriex-skill).
 
 > SerieX is bookkeeping and payroll software, not tax, legal or accounting advice. Check your numbers and forms, and ask an accountant or tax professional when in doubt.
 

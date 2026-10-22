@@ -36,7 +36,8 @@ ${iconUrl ? `<img alt="" src="${iconUrl}">` : ''}
 </body></html>`;
 }
 
-function show() {
+/** icon: the window icon on Linux (main.js windowIcon()); undefined on Mac and Windows. */
+function show(icon) {
   if (win) {
     win.show();
     return;
@@ -53,6 +54,7 @@ function show() {
     center: true,
     title: 'SerieX',
     backgroundColor: '#ffffff',
+    ...(icon ? { icon } : {}),
     webPreferences: { sandbox: true, contextIsolation: true, nodeIntegration: false, spellcheck: false },
   });
   win.webContents.on('will-navigate', (e) => e.preventDefault());

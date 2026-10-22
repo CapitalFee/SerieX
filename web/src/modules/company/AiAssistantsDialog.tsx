@@ -182,7 +182,7 @@ function terminalName(platform: Platform): string {
 function fileApps(platform: Platform): { files: string; editor: string } {
   if (platform === 'darwin') return { files: 'Finder', editor: 'TextEdit' };
   if (platform === 'windows') return { files: 'File Explorer', editor: 'Notepad' };
-  return { files: 'your file manager', editor: 'a text editor' };
+  return { files: 'Files', editor: 'Text Editor' }; // Ubuntu's apps
 }
 
 // ---------------------------------------------------------------------------
@@ -699,13 +699,17 @@ function AskAdmin({ st }: { st: AiAssistantsStatus }) {
         </div>
       </div>
       <p className="cx-muted cx-small ai-p">
-        It works with the Claude and ChatGPT desktop apps, Claude Code, Grok Build, and apps such as Cursor, LM Studio and Visual Studio Code.
+        {st.platform === 'linux'
+          ? 'It works with Claude Code, Codex, Grok Build, Cursor, LM Studio and Visual Studio Code.'
+          : 'It works with the Claude and ChatGPT desktop apps, Claude Code, Grok Build, and apps such as Cursor, LM Studio and Visual Studio Code.'}
       </p>
     </>
   );
 }
 
 function ConnectTabs({ st, tab, setTab, keys, entry }: { st: AiAssistantsStatus; tab: Tab; setTab(t: Tab): void; keys: KeyAccess; entry: string }) {
+  // The ChatGPT desktop app is made for Mac and Windows: on Linux the tab is about OpenAI's Codex.
+  const chatgpt = st.platform === 'linux' ? 'Codex' : 'ChatGPT';
   return (
     <>
       <SegmentedControl<Tab>
@@ -715,12 +719,12 @@ function ConnectTabs({ st, tab, setTab, keys, entry }: { st: AiAssistantsStatus;
         aria-label="AI assistant app"
         options={[
           { value: 'claude', label: 'Claude' },
-          { value: 'chatgpt', label: 'ChatGPT' },
+          { value: 'chatgpt', label: chatgpt },
           { value: 'grok', label: 'Grok' },
           { value: 'other', label: 'Other apps' },
         ]}
       />
-      <div className="ai-tab" role="region" aria-label={{ claude: 'Claude', chatgpt: 'ChatGPT', grok: 'Grok', other: 'Other apps' }[tab]}>
+      <div className="ai-tab" role="region" aria-label={{ claude: 'Claude', chatgpt, grok: 'Grok', other: 'Other apps' }[tab]}>
         {!st.helper.available && (
           <div className="cx-note cx-info cx-small ai-gap" role="note">
             <Info size={15} />
@@ -882,73 +886,82 @@ function ClaudeTab({ st, keys, entry }: TabProps) {
   const apps = fileApps(st.platform);
   const setUp = !!done || !!st.setup?.claudeDesktop.configured;
   const offerButton = !!st.setup && !setUp;
+  // The Claude desktop app is made for Mac and Windows: on Linux its steps show only when SerieX
+  // finds Claude's settings folder (a Claude app for Linux made it).
+  const noDesktopApp = st.platform === 'linux' && !st.setup?.claudeDesktop.appFound;
   return (
     <>
-      <h4 className="ai-h4">Claude desktop app</h4>
-      {helper ? (
-        <>
-          {st.setup && (
-            <SetupButton
-              target="claudeDesktop"
-              file={st.setup.claudeDesktop}
-              app="Claude"
-              after="In a new chat, open the tools menu in the message box (the + button) and check that seriex is listed and turned on."
-              done={done}
-              onDone={setDone}
-            />
-          )}
-          {/* On Windows the button is the main way: it finds the file Claude reads by itself. */}
-          <ManualSteps setUp={setUp} fold={windows && offerButton} app="Claude">
-            {windows ? (
-              <>
-                <p className="ai-p">
-                  Claude keeps its settings in a file named claude_desktop_config.json. Which one it reads depends on how Claude was installed:
-                </p>
-                <ul className="ai-files">
-                  <li>
-                    If {CLAUDE_PACKAGES} has a folder whose name starts with Claude_ (for example Claude from the Microsoft Store), it is{' '}
-                    <code className="ai-inline">{CLAUDE_FILE_PACKAGED}</code>, where Claude_* is that folder.
-                  </li>
-                  <li>
-                    Otherwise it is <code className="ai-inline">{CLAUDE_FILE.windows}</code>.
-                  </li>
-                </ul>
-                <p className="ai-p">
-                  To look, paste {CLAUDE_PACKAGES} into the address bar of {apps.files} and press Enter. Open the file with {apps.editor}, or create it
-                  if it is not there.
-                </p>
-              </>
-            ) : (
-              <p className="ai-p">
-                {offerButton ? 'Or do it by hand: in' : 'In'} Claude, open Settings, then Developer, then Edit Config. Claude shows its settings file,
-                claude_desktop_config.json, in {apps.files}. Open that file with {apps.editor}.
-              </p>
-            )}
-            <p className="ai-p">If the file is empty or holds only {'{}'}, replace everything in it with this:</p>
-            <CodeBlock text={mcpServersJson(st)} what="the Claude settings" />
-            <p className="ai-p">
-              If the file already has other text, keep it. Put only this part inside the braces after "mcpServers", with a comma between it and the
-              entry before it:
-            </p>
-            <CodeBlock text={seriexEntryJson(st)} what="the seriex part of the Claude settings" />
-            <p className="cx-muted cx-small ai-p">
-              {offerButton
-                ? 'If the file has text but no "mcpServers" yet, the Set up Claude for me button above is the easy way.'
-                : 'If the file has text but no "mcpServers" yet, add "mcpServers": { } with the part above inside the braces, followed by a comma, right after the first { of the file.'}
-            </p>
-            <p className="ai-p">Save the file, then quit Claude completely and open it again.</p>
-            {(st.setup || !windows) && (
-              <p className="cx-muted cx-small ai-p ai-filenote">
-                {windows ? 'On this computer the file is' : 'The file is'} {st.setup?.claudeDesktop.file || CLAUDE_FILE[st.platform]}.
-              </p>
-            )}
-          </ManualSteps>
-        </>
+      {noDesktopApp ? (
+        <p className="ai-p">SerieX did not find the Claude desktop app on this computer. On Linux, use Claude Code, Anthropic's terminal app:</p>
       ) : (
-        <p className="ai-p">The Claude desktop app can connect only through the SerieX desktop app.</p>
+        <>
+          <h4 className="ai-h4">Claude desktop app</h4>
+          {helper ? (
+            <>
+              {st.setup && (
+                <SetupButton
+                  target="claudeDesktop"
+                  file={st.setup.claudeDesktop}
+                  app="Claude"
+                  after="In a new chat, open the tools menu in the message box (the + button) and check that seriex is listed and turned on."
+                  done={done}
+                  onDone={setDone}
+                />
+              )}
+              {/* On Windows the button is the main way: it finds the file Claude reads by itself. */}
+              <ManualSteps setUp={setUp} fold={windows && offerButton} app="Claude">
+                {windows ? (
+                  <>
+                    <p className="ai-p">
+                      Claude keeps its settings in a file named claude_desktop_config.json. Which one it reads depends on how Claude was installed:
+                    </p>
+                    <ul className="ai-files">
+                      <li>
+                        If {CLAUDE_PACKAGES} has a folder whose name starts with Claude_ (for example Claude from the Microsoft Store), it is{' '}
+                        <code className="ai-inline">{CLAUDE_FILE_PACKAGED}</code>, where Claude_* is that folder.
+                      </li>
+                      <li>
+                        Otherwise it is <code className="ai-inline">{CLAUDE_FILE.windows}</code>.
+                      </li>
+                    </ul>
+                    <p className="ai-p">
+                      To look, paste {CLAUDE_PACKAGES} into the address bar of {apps.files} and press Enter. Open the file with {apps.editor}, or create it
+                      if it is not there.
+                    </p>
+                  </>
+                ) : (
+                  <p className="ai-p">
+                    {offerButton ? 'Or do it by hand: in' : 'In'} Claude, open Settings, then Developer, then Edit Config. Claude shows its settings file,
+                    claude_desktop_config.json, in {apps.files}. Open that file with {apps.editor}.
+                  </p>
+                )}
+                <p className="ai-p">If the file is empty or holds only {'{}'}, replace everything in it with this:</p>
+                <CodeBlock text={mcpServersJson(st)} what="the Claude settings" />
+                <p className="ai-p">
+                  If the file already has other text, keep it. Put only this part inside the braces after "mcpServers", with a comma between it and the
+                  entry before it:
+                </p>
+                <CodeBlock text={seriexEntryJson(st)} what="the seriex part of the Claude settings" />
+                <p className="cx-muted cx-small ai-p">
+                  {offerButton
+                    ? 'If the file has text but no "mcpServers" yet, the Set up Claude for me button above is the easy way.'
+                    : 'If the file has text but no "mcpServers" yet, add "mcpServers": { } with the part above inside the braces, followed by a comma, right after the first { of the file.'}
+                </p>
+                <p className="ai-p">Save the file, then quit Claude completely and open it again.</p>
+                {(st.setup || !windows) && (
+                  <p className="cx-muted cx-small ai-p ai-filenote">
+                    {windows ? 'On this computer the file is' : 'The file is'} {st.setup?.claudeDesktop.file || CLAUDE_FILE[st.platform]}.
+                  </p>
+                )}
+              </ManualSteps>
+            </>
+          ) : (
+            <p className="ai-p">The Claude desktop app can connect only through the SerieX desktop app.</p>
+          )}
+        </>
       )}
 
-      <h4 className="ai-h4">Claude Code (for technical users)</h4>
+      <h4 className="ai-h4">{noDesktopApp ? 'Claude Code' : 'Claude Code (for technical users)'}</h4>
       <p className="ai-p">In {terminalName(st.platform)}, run:</p>
       {helper ? (
         <CodeBlock text={`claude mcp add --scope user seriex -- ${helperCommand(st)}`} what="the Claude Code command" />
@@ -961,7 +974,7 @@ function ClaudeTab({ st, keys, entry }: TabProps) {
       <p className="ai-p">Then check that {name} is listed:</p>
       <CodeBlock text="claude mcp list" what="the check command" />
       <p className="cx-muted cx-small ai-p">
-        {helper
+        {helper && !noDesktopApp
           ? 'This works in the Claude desktop app and Claude Code, not on claude.ai or the phone app.'
           : 'This works in Claude Code, not on claude.ai or the phone app.'}
       </p>
@@ -975,53 +988,81 @@ function ChatGptTab({ st, keys, entry }: TabProps) {
   const http = keyedText(keys, (k) => [`[mcp_servers.${entry}]`, `url = ${tomlBasic(st.address)}`, `http_headers = { "Authorization" = ${tomlBasic('Bearer ' + k)} }`].join('\n'));
   const setUp = !!done || !!st.setup?.codex.configured;
   const offerButton = !!st.setup && !setUp;
-  const restart = 'Then in ChatGPT open Settings, then MCP servers, and click Restart (or quit and reopen ChatGPT).';
+  // The ChatGPT desktop app is made for Mac and Windows: on Linux this tab is about OpenAI's Codex
+  // (the codex terminal app, or the Codex extension in VS Code or Cursor), which reads the same file.
+  const linux = st.platform === 'linux';
+  const app = linux ? 'Codex' : 'ChatGPT';
+  const restart = linux
+    ? 'Then start Codex again (in VS Code or Cursor, reload the window).'
+    : 'Then in ChatGPT open Settings, then MCP servers, and click Restart (or quit and reopen ChatGPT).';
+  // On Linux the server's message after the setup already says to start Codex again and type /mcp.
+  const after = linux
+    ? done
+      ? ''
+      : 'Start Codex again (in VS Code or Cursor, reload the window), then type /mcp to check that seriex is listed.'
+    : 'Start a Work or Codex conversation; regular Chat conversations cannot use SerieX yet. Type /mcp to check that seriex is listed.';
   return (
     <>
-      <p className="ai-p">Use the new ChatGPT desktop app (not ChatGPT Classic).</p>
+      <p className="ai-p">
+        {linux
+          ? "On Linux, use OpenAI's Codex: the codex terminal app, or the Codex extension in VS Code or Cursor. They share one settings file."
+          : 'Use the new ChatGPT desktop app (not ChatGPT Classic).'}
+      </p>
       {viaHelper(st) ? (
         <>
           {st.setup && (
             <SetupButton
               target="codex"
               file={st.setup.codex}
-              app="ChatGPT"
-              after="Start a Work or Codex conversation; regular Chat conversations cannot use SerieX yet. Type /mcp to check that seriex is listed."
+              app={app}
+              after={after}
               done={done}
               onDone={setDone}
             />
           )}
-          <p className="cx-muted cx-small ai-p">
-            {offerButton
-              ? "This also sets up OpenAI's Codex, which uses the same settings."
-              : setUp
-                ? "OpenAI's Codex uses the same settings as ChatGPT, so it is set up too."
-                : "OpenAI's Codex uses the same settings as ChatGPT."}
-          </p>
-
-          <ManualSteps setUp={setUp} app="ChatGPT">
-            <h4 className="ai-h4">{offerButton ? 'Or do it yourself' : 'Set it up yourself'}</h4>
-            <p className="ai-p">
-              <b>Option A.</b> In ChatGPT open Settings, then MCP servers, then Add server. Choose STDIO, type the name <b>seriex</b> and this command:
+          {!linux && (
+            <p className="cx-muted cx-small ai-p">
+              {offerButton
+                ? "This also sets up OpenAI's Codex, which uses the same settings."
+                : setUp
+                  ? "OpenAI's Codex uses the same settings as ChatGPT, so it is set up too."
+                  : "OpenAI's Codex uses the same settings as ChatGPT."}
             </p>
-            <CodeBlock text={st.helper.path} what="the command" />
-            {st.helper.args.length > 0 && (
+          )}
+
+          <ManualSteps setUp={setUp} app={app}>
+            <h4 className="ai-h4">{offerButton ? 'Or do it yourself' : 'Set it up yourself'}</h4>
+            {!linux && (
               <>
-                <p className="ai-p">Add these arguments, one per line:</p>
-                <CodeBlock text={st.helper.args.join('\n')} what="the arguments" />
+                <p className="ai-p">
+                  <b>Option A.</b> In ChatGPT open Settings, then MCP servers, then Add server. Choose STDIO, type the name <b>seriex</b> and this command:
+                </p>
+                <CodeBlock text={st.helper.path} what="the command" />
+                {st.helper.args.length > 0 && (
+                  <>
+                    <p className="ai-p">Add these arguments, one per line:</p>
+                    <CodeBlock text={st.helper.args.join('\n')} what="the arguments" />
+                  </>
+                )}
               </>
             )}
             <p className="ai-p">
-              <b>Option B.</b> Add this to the end of the file {file}. Use only one of the two options:
+              {linux ? (
+                <>Add this to the end of the file {file}:</>
+              ) : (
+                <>
+                  <b>Option B.</b> Add this to the end of the file {file}. Use only one of the two options:
+                </>
+              )}
             </p>
-            <CodeBlock text={codexToml(st)} what="the ChatGPT settings" />
+            <CodeBlock text={codexToml(st)} what={`the ${app} settings`} />
             <p className="cx-muted cx-small ai-p">{restart}</p>
           </ManualSteps>
         </>
       ) : (
         <>
-          <p className="ai-p">Add this to the file {file}, which ChatGPT and OpenAI's Codex share:</p>
-          <CodeBlock text={http.text} copy={http.copy} what="the ChatGPT settings" />
+          <p className="ai-p">{linux ? <>Add this to the Codex settings file {file}:</> : <>Add this to the file {file}, which ChatGPT and OpenAI's Codex share:</>}</p>
+          <CodeBlock text={http.text} copy={http.copy} what={`the ${app} settings`} />
           <KeyNote st={st} keys={keys} />
           <p className="cx-muted cx-small ai-p">{restart}</p>
         </>

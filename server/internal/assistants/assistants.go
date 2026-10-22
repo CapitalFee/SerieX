@@ -100,7 +100,7 @@ type cachedSession struct {
 type helperInfo struct {
 	path string   // absolute path ("" when not given or not usable)
 	ok   bool     // the setup of assistant apps can use it
-	args []string // ["--data", <data root>] when the data root is not the default one
+	args []string // ["--data", <data root>] when the data root is not the default one, and always on Linux: an app started with another XDG_CONFIG_HOME, such as any Flatpak app, would look for SerieX elsewhere
 }
 
 // Register sets up the AI assistant connection: the company routes and /mcp.
@@ -215,7 +215,7 @@ func findHelper(path, booksDir string) helperInfo {
 	root := filepath.Dir(booksDir)
 	h.ok = true
 	h.args = []string{}
-	if !sameDir(root, seriexmcp.DefaultDataDir()) {
+	if runtime.GOOS == "linux" || !sameDir(root, seriexmcp.DefaultDataDir()) {
 		h.args = []string{"--data", root}
 	}
 	return h

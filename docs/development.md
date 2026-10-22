@@ -7,6 +7,7 @@ SerieX is written in Go (the two servers) and TypeScript with React (the screens
 - Go 1.25 or later (build releases with the newest Go release, at least Go 1.26.10, which has security fixes the servers need)
 - Node.js 22.12 or later, with npm
 - Git
+- xz, for the Ubuntu packages (on a Mac: `brew install xz`). The first Ubuntu build downloads Electron for Linux and the packaging tools of electron-builder (the tool that makes the installers) from GitHub.
 
 ## Run SerieX Books from source
 
@@ -40,12 +41,21 @@ Then open http://127.0.0.1:8090. Payroll company files go to `payroll/server/dat
 (cd payroll/web && npm install)
 cd desktop
 npm install
-npm run build:mac   # Mac installers, Apple silicon and Intel
-npm run build:win   # Windows installer
-npm run build:all   # both
+npm run build:mac     # Mac installers, Apple silicon and Intel
+npm run build:win     # Windows installer
+npm run build:linux   # Ubuntu packages (.deb, amd64 and arm64)
+npm run build:all     # Mac, Windows and Ubuntu
 ```
 
-The installers are written to `desktop/dist/`. After `npm run build:mac` on a Mac, `npm start` runs the desktop app straight from the source folder.
+The installers are written to `desktop/dist/`. The Ubuntu packages are `desktop/dist/SerieX-linux-amd64.deb` and `SerieX-linux-arm64.deb`. After `npm run build:mac` on a Mac, `npm start` runs the desktop app straight from the source folder.
+
+To check that an Ubuntu package installs, try it in a Docker container (a throwaway Ubuntu system). From the `SerieX` folder:
+
+```sh
+docker run --rm -it -v "$PWD/desktop/dist:/dist:ro" ubuntu:24.04 bash -c 'apt-get update && apt-get install -y /dist/SerieX-linux-arm64.deb'
+```
+
+The arm64 package runs at full speed on an Apple silicon Mac. For the amd64 package, add `--platform linux/amd64` after `run` and use `SerieX-linux-amd64.deb`; it runs slowly, because the Mac imitates an Intel processor.
 
 Maintainers publish a release with `npm run publish -- --commit <commit>` in `desktop/` (see `desktop/scripts/publish.mjs`).
 

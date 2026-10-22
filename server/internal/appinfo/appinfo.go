@@ -16,7 +16,7 @@ import (
 // AppName and Version identify this server to the web client and to SerieX Payroll.
 const (
 	AppName = "SerieX Books"
-	Version = "2026.10.3"
+	Version = "2026.10.4"
 )
 
 // Info is the response of GET /api/info.

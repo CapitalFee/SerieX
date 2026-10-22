@@ -1,7 +1,8 @@
 // Renders the SerieX app icon from assets/*.svg with Electron's own Chromium (no other tools).
 // Run by scripts/build.mjs as: electron scripts/render-icons.cjs <output folder>
-// Writes icon.png (1024 x 1024, macOS; electron-builder turns it into icon.icns) and
-// icon.ico (Windows: 16-64 px as bitmaps, 128 and 256 px as PNG).
+// Writes icon.png (1024 x 1024, macOS; electron-builder turns it into icon.icns),
+// icon.ico (Windows: 16-64 px as bitmaps, 128 and 256 px as PNG) and
+// icons/<n>x<n>.png (Ubuntu, 16 to 512 px).
 const { app, BrowserWindow } = require('electron');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -105,6 +106,13 @@ app.whenReady().then(async () => {
     for (const s of [48, 64, 128, 256]) ico.push(await render(win, winArt, s));
     writeIco(path.join(outDir, 'icon.ico'), ico);
     fs.writeFileSync(path.join(outDir, 'icon-256.png'), ico[ico.length - 1].png);
+    // Ubuntu: one PNG per size, because its icon theme stops at 512 px and ignores a single 1024 px
+    // picture. 48 px and up use the macOS art: its margin matches how Ubuntu draws app icons.
+    const linuxDir = path.join(outDir, 'icons');
+    fs.rmSync(linuxDir, { recursive: true, force: true });
+    fs.mkdirSync(linuxDir, { recursive: true });
+    for (const s of [16, 24, 32]) fs.writeFileSync(path.join(linuxDir, `${s}x${s}.png`), (await render(win, small, s)).png);
+    for (const s of [48, 64, 128, 256, 512]) fs.writeFileSync(path.join(linuxDir, `${s}x${s}.png`), (await render(win, big, s)).png);
     win.destroy();
     console.log(`icons written to ${outDir}`);
   } catch (e) {

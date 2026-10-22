@@ -2,20 +2,23 @@
 //
 //   node scripts/build.mjs mac          macOS DMGs and ZIPs (Apple Silicon and Intel)
 //   node scripts/build.mjs win          Windows installer (x64)
-//   node scripts/build.mjs all          both
+//   node scripts/build.mjs linux        Ubuntu packages (.deb, x64 and arm64)
+//   node scripts/build.mjs all          all three
 //
 // Installer names do not change between versions (release/install.sh and install.ps1 download
-// them by name): SerieX-mac-arm64.dmg / .zip, SerieX-mac-x64.dmg / .zip, SerieX-Setup-x64.exe.
+// them by name): SerieX-mac-arm64.dmg / .zip, SerieX-mac-x64.dmg / .zip, SerieX-Setup-x64.exe,
+// SerieX-linux-amd64.deb, SerieX-linux-arm64.deb.
 //
-// Options: --mac-arch arm64|x64 (one macOS build only), --skip-web, --skip-servers, --skip-icon,
-// --skip-mcpb
+// Options: --mac-arch arm64|x64 (one macOS build only), --linux-arch x64|arm64 (one Ubuntu
+// package only), --skip-web, --skip-servers, --skip-icon, --skip-mcpb
 //
 // Steps: (a) build both web clients with Vite into build/books-web and build/payroll-web,
 // (b) cross-compile both Go servers (and the seriex-mcp helper) into build/servers/<os>-<arch>/
 // with GOTOOLCHAIN=auto, so the toolchain line of each go.mod picks the Go version, and check
 // that version in each binary, (c) write the license files: build/LICENSE (the root LICENSE) and
 // build/THIRD_PARTY_NOTICES.txt (scripts/notices.mjs), (d) render the app icon, (e) package with
-// electron-builder; both license files go into the app's resources folder on every system,
+// electron-builder; both license files go into the app's resources folder on every system (the
+// Ubuntu package puts the servers, web pages and license files in /opt/SerieX/resources),
 // (f) "all" on a Mac only: the SerieX extension packages for Claude Desktop (mcp/packaging/build.sh)
 // into dist/mcp/: seriex-<version>-darwin-universal.mcpb, seriex-<version>-windows-amd64.mcpb (both
 // published with the release) and server.json (for mcp-publisher, not published), (g) "all" only:
@@ -47,16 +50,25 @@ const option = (name) => {
   const i = argv.indexOf(`--${name}`);
   return i >= 0 ? argv[i + 1] : undefined;
 };
-if (!['mac', 'win', 'all'].includes(what)) {
-  console.error('usage: node scripts/build.mjs mac|win|all [--mac-arch arm64|x64] [--skip-web] [--skip-servers] [--skip-icon] [--skip-mcpb]');
+if (!['mac', 'win', 'linux', 'all'].includes(what)) {
+  console.error('usage: node scripts/build.mjs mac|win|linux|all [--mac-arch arm64|x64] [--linux-arch x64|arm64] [--skip-web] [--skip-servers] [--skip-icon] [--skip-mcpb]');
   process.exit(2);
 }
 const wantMac = what === 'mac' || what === 'all';
 const wantWin = what === 'win' || what === 'all';
+const wantLinux = what === 'linux' || what === 'all';
 const macArchs = (option('mac-arch') || 'arm64,x64').split(',').map((s) => s.trim()).filter(Boolean);
 for (const a of macArchs) if (!['arm64', 'x64'].includes(a)) throw new Error(`unknown macOS arch ${a}`);
+const linuxArchs = (option('linux-arch') || 'x64,arm64').split(',').map((s) => s.trim()).filter(Boolean);
+for (const a of linuxArchs) if (!['arm64', 'x64'].includes(a)) throw new Error(`unknown Linux arch ${a}`);
 
 const GOARCH = { arm64: 'arm64', x64: 'amd64' };
+// Go's names for this computer, for the checks that run the servers here.
+const HOST_OS = { darwin: 'darwin', win32: 'windows', linux: 'linux' }[process.platform];
+const HOST_ARCH = GOARCH[process.arch] || process.arch;
+// The Maintainer field of the Ubuntu packages (required by the .deb format). It is public: anyone
+// can read it in every package, with "dpkg -s seriex" or "apt show seriex".
+const LINUX_MAINTAINER = 'SerieX <37116247+kryonsx@users.noreply.github.com>';
 const LICENSE_FILE = path.join(root, 'LICENSE');
 const NOTICES_FILE = path.join(buildDir, 'THIRD_PARTY_NOTICES.txt');
 
@@ -150,6 +162,7 @@ function serverTargets() {
   const t = [];
   if (wantMac) for (const a of macArchs) t.push({ goos: 'darwin', goarch: GOARCH[a] });
   if (wantWin) t.push({ goos: 'windows', goarch: 'amd64' });
+  if (wantLinux) for (const a of linuxArchs) t.push({ goos: 'linux', goarch: GOARCH[a] });
   return t;
 }
 
@@ -171,26 +184,46 @@ function buildServers() {
     }
   }
   // The desktop app passes -payroll to SerieX Books and -books to SerieX Payroll: check both
-  // flags exist, using the build that runs on this computer.
-  const hostOs = { darwin: 'darwin', win32: 'windows', linux: 'linux' }[process.platform];
-  const hostDir = path.join(buildDir, 'servers', `${hostOs}-${GOARCH[process.arch] || process.arch}`);
+  // flags exist, using the build that runs on this computer. When this computer is not one of the
+  // targets (for example "build.mjs linux" or "win" on a Mac), a throw-away build for this
+  // computer is made in build/servers/.check-<os>-<arch> and removed after the checks.
+  const throwaway = !serverTargets().some((t) => t.goos === HOST_OS && t.goarch === HOST_ARCH);
+  const hostDir = path.join(buildDir, 'servers', `${throwaway ? '.check-' : ''}${HOST_OS}-${HOST_ARCH}`);
   const ext = IS_WIN_HOST ? '.exe' : '';
-  for (const [name, needed] of [
-    ['seriex-books', '-payroll'],
-    ['seriex-payroll', '-books'],
-  ]) {
-    const bin = path.join(hostDir, name + ext);
-    if (!fs.existsSync(bin)) continue;
-    const r = spawnSync(bin, ['-h'], { encoding: 'utf8' });
-    const help = `${r.stdout || ''}${r.stderr || ''}`;
-    if (!help.includes(`${needed} `) && !help.includes(`${needed}\n`)) throw new Error(`${name} does not accept the ${needed} option`);
-    console.log(`${name} accepts ${needed}`);
+  try {
+    if (throwaway) {
+      step(`servers for this computer (${HOST_OS}/${HOST_ARCH}), only to check their options`);
+      fs.rmSync(hostDir, { recursive: true, force: true });
+      fs.mkdirSync(hostDir, { recursive: true });
+      for (const [name, dir] of programs) {
+        const out = path.join(hostDir, name + ext);
+        run('go', ['build', '-trimpath', '-ldflags', '-s -w', '-o', out, '.'], { cwd: dir, shell: false, env: goEnv(HOST_OS, HOST_ARCH) });
+        mustExist(out);
+      }
+    }
+    for (const [name, needed] of [
+      ['seriex-books', '-payroll'],
+      ['seriex-payroll', '-books'],
+    ]) {
+      const bin = path.join(hostDir, name + ext);
+      mustExist(bin);
+      const r = spawnSync(bin, ['-h'], { encoding: 'utf8' });
+      const help = `${r.stdout || ''}${r.stderr || ''}`;
+      if (!help.includes(`${needed} `) && !help.includes(`${needed}\n`)) throw new Error(`${name} does not accept the ${needed} option`);
+      console.log(`${name} accepts ${needed}`);
+    }
+    buildMcpHelper(hostDir, ext, throwaway);
+  } finally {
+    if (throwaway) fs.rmSync(hostDir, { recursive: true, force: true });
   }
-  buildMcpHelper(hostDir, ext);
 }
 
-/** Builds seriex-mcp next to the servers of every target, when mcp/ exists and Books accepts -mcp-helper. */
-function buildMcpHelper(hostDir, ext) {
+/**
+ * Builds seriex-mcp next to the servers of every target, when mcp/ exists and Books accepts
+ * -mcp-helper. With throwaway set, hostDir is the check folder of buildServers(), and seriex-mcp
+ * is also built there for this computer, for the --version check.
+ */
+function buildMcpHelper(hostDir, ext, throwaway) {
   if (!fs.existsSync(path.join(mcpDir, 'cmd', 'seriex-mcp'))) {
     console.log('seriex-mcp: mcp/cmd/seriex-mcp not found, the helper is not bundled');
     return;
@@ -213,6 +246,14 @@ function buildMcpHelper(hostDir, ext) {
     checkGoVersion(out, mcpDir, `seriex-mcp ${goos}/${goarch}`);
   }
   const helper = path.join(hostDir, 'seriex-mcp' + ext);
+  if (throwaway) {
+    run('go', ['build', '-trimpath', '-ldflags', `-s -w -X main.version=${appVersion}`, '-o', helper, './cmd/seriex-mcp'], {
+      cwd: mcpDir,
+      shell: false,
+      env: goEnv(HOST_OS, HOST_ARCH),
+    });
+    mustExist(helper);
+  }
   const v = spawnSync(helper, ['--version'], { encoding: 'utf8' });
   if (!`${v.stdout || ''}${v.stderr || ''}`.includes(appVersion)) throw new Error(`seriex-mcp --version does not say ${appVersion}`);
   console.log(`seriex-mcp ${appVersion} bundled`);
@@ -249,14 +290,15 @@ function buildIcon() {
   }
   mustExist(path.join(buildDir, 'icon.png'));
   mustExist(path.join(buildDir, 'icon.ico'));
+  mustExist(path.join(buildDir, 'icons', '512x512.png'));
 }
 
 // ---- (e) electron-builder ----
 
 /**
- * The files next to app.asar (resources/ on Windows, SerieX.app/Contents/Resources on macOS):
- * the servers, the web pages, LICENSE and THIRD_PARTY_NOTICES.txt (Help > License and
- * Help > Third-Party Notices open these two).
+ * The files next to app.asar (resources/ on Windows, SerieX.app/Contents/Resources on macOS,
+ * /opt/SerieX/resources on Ubuntu): the servers, the web pages, LICENSE and
+ * THIRD_PARTY_NOTICES.txt (Help > License and Help > Third-Party Notices open these two).
  */
 function resources(serverDir) {
   for (const d of [serverDir, 'build/books-web', 'build/payroll-web', 'build/LICENSE', 'build/THIRD_PARTY_NOTICES.txt']) {
@@ -285,13 +327,19 @@ function electronNotices() {
   ];
 }
 
-/** Locks the Electron binary down; on macOS also gives the whole app an ad-hoc signature (there is no certificate). */
+/**
+ * Locks the Electron binary down; on macOS also gives the whole app an ad-hoc signature (there is
+ * no certificate); on Ubuntu makes sure the servers can be run.
+ */
 async function afterPack(context) {
   const { flipFuses, FuseVersion, FuseV1Options } = require('@electron/fuses');
   const mac = context.electronPlatformName === 'darwin';
+  const linux = context.electronPlatformName === 'linux';
   const exe = mac
     ? path.join(context.appOutDir, `${context.packager.appInfo.productFilename}.app`)
-    : path.join(context.appOutDir, `${context.packager.appInfo.productFilename}.exe`);
+    : linux
+      ? path.join(context.appOutDir, context.packager.executableName) // .../linux-unpacked/seriex
+      : path.join(context.appOutDir, `${context.packager.appInfo.productFilename}.exe`);
   await flipFuses(exe, {
     version: FuseVersion.V1,
     resetAdHocDarwinSignature: mac,
@@ -303,6 +351,11 @@ async function afterPack(context) {
     ...(mac ? { [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true } : {}),
   });
   console.log(`fuses set on ${exe}`);
+  if (linux) {
+    const servers = path.join(context.appOutDir, 'resources', 'servers');
+    for (const f of fs.readdirSync(servers)) fs.chmodSync(path.join(servers, f), 0o755);
+    return;
+  }
   if (!mac) return;
   const servers = path.join(exe, 'Contents', 'Resources', 'servers');
   for (const f of fs.readdirSync(servers)) {
@@ -332,7 +385,7 @@ function removeOldInstallers(test) {
   const dist = path.join(desktop, 'dist');
   if (!fs.existsSync(dist)) return;
   for (const f of fs.readdirSync(dist)) {
-    if (/^SerieX-.*\.(dmg|zip|exe|blockmap)$/i.test(f) && test(f)) fs.rmSync(path.join(dist, f), { force: true });
+    if (/^SerieX-.*\.(dmg|zip|exe|deb|blockmap)$/i.test(f) && test(f)) fs.rmSync(path.join(dist, f), { force: true });
   }
 }
 
@@ -396,6 +449,51 @@ async function packageWin(builder) {
   });
 }
 
+/**
+ * Ubuntu: one .deb per processor, installed into /opt/SerieX (program seriex, menu entry
+ * seriex.desktop). Its install step adds the AppArmor rule (Ubuntu's security rules) that lets
+ * Chromium's sandbox run on Ubuntu 24.04 and later. These are Linux settings only, so the Mac and
+ * Windows builds do not change: desktopName and homepage go into this package's package.json only.
+ */
+async function packageLinux(builder, arch) {
+  const debArch = GOARCH[arch];
+  step(`Ubuntu package (${debArch})`);
+  if (spawnSync('xz', ['--version'], { stdio: 'ignore' }).error) {
+    throw new Error('xz is missing: the Ubuntu packages are compressed with it. On a Mac, install it with "brew install xz".');
+  }
+  removeOldInstallers((f) => f.startsWith(`SerieX-linux-${debArch}.`));
+  mustExist(path.join(buildDir, 'icons', '256x256.png'), 'Render the icons first (drop --skip-icon).');
+  const { Platform, Arch } = builder;
+  await builder.build({
+    targets: Platform.LINUX.createTarget(['deb'], Arch[arch]),
+    config: {
+      ...baseConfig(),
+      extraMetadata: { desktopName: 'seriex.desktop', homepage: 'https://github.com/CapitalFee/SerieX' },
+      linux: {
+        executableName: 'seriex', // not at the top level: that would rename SerieX.exe
+        syncDesktopName: true,
+        icon: 'build/icons',
+        category: 'Office;Finance',
+        synopsis: 'Free bookkeeping and payroll',
+        description: 'SerieX Books and SerieX Payroll as a desktop application',
+        maintainer: LINUX_MAINTAINER,
+        vendor: 'SerieX',
+        // Electron's own license files land next to the program by themselves, as on Windows.
+        extraResources: [...resources(`build/servers/linux-${debArch}`), { from: 'build/icons/256x256.png', to: 'icon.png' }],
+        artifactName: 'SerieX-linux-${arch}.${ext}', // ${arch} is amd64 or arm64 for a .deb
+      },
+      deb: {
+        packageName: 'seriex',
+        packageCategory: 'office',
+        // libasound2t64 first: a plain libasound2 makes apt pick liboss4-salsa-asound2 on 24.04, which crashes SerieX.
+        depends: ['libgtk-3-0', 'libnotify4', 'libnss3', 'libxss1', 'libxtst6', 'xdg-utils', 'libatspi2.0-0', 'libuuid1', 'libsecret-1-0', 'libasound2t64 | libasound2', 'libgbm1'],
+        recommends: [], // the default libappindicator3-1 does not exist on 24.04, and SerieX does not use it
+      },
+    },
+  });
+  mustExist(path.join(desktop, 'dist', `SerieX-linux-${debArch}.deb`), 'electron-builder did not write it.');
+}
+
 // ---- (f) extension packages for Claude Desktop ----
 
 /** Builds the .mcpb packages and server.json into dist/mcp/ with mcp/packaging/build.sh (needs a Mac: lipo). */
@@ -449,6 +547,7 @@ if (!flag('skip-icon')) buildIcon();
 const builder = require('electron-builder');
 if (wantMac) for (const a of macArchs) await packageMac(builder, a);
 if (wantWin) await packageWin(builder);
+if (wantLinux) for (const a of linuxArchs) await packageLinux(builder, a);
 if (what === 'all' && !flag('skip-mcpb')) buildMcpb();
 if (what === 'all') buildSkill();
 
@@ -456,7 +555,7 @@ step('installers');
 const dist = path.join(desktop, 'dist');
 const mcpbDir = path.join(dist, 'mcp');
 const outputs = [
-  ...fs.readdirSync(dist).filter((f) => /\.(dmg|zip|exe|skill)$/i.test(f)).map((f) => path.join(dist, f)),
+  ...fs.readdirSync(dist).filter((f) => /\.(dmg|zip|exe|deb|skill)$/i.test(f)).map((f) => path.join(dist, f)),
   ...(fs.existsSync(mcpbDir) ? fs.readdirSync(mcpbDir).filter((f) => f.endsWith('.mcpb')).map((f) => path.join(mcpbDir, f)) : []),
 ];
 for (const f of outputs.sort()) {

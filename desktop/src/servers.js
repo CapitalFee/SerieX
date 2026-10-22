@@ -16,6 +16,7 @@ const settings = require('./settings');
 const { log, rotate } = require('./log');
 
 const IS_WIN = process.platform === 'win32';
+const IS_LINUX = process.platform === 'linux';
 
 // stopEnv: the variable that hands the server its stop secret (Windows).
 // stopWait: how long a server that accepted the stop request gets before it is forced (SerieX Books backs up first).
@@ -75,6 +76,15 @@ async function isOurServer(pid, key) {
   if (IS_WIN) {
     const out = await run('tasklist', ['/FI', `PID eq ${pid}`, '/FO', 'CSV', '/NH']);
     return out.toLowerCase().includes(`"${name}"`);
+  }
+  if (IS_LINUX) {
+    // the program name from /proc (no ps program needed); it holds at most 15 characters, and
+    // seriex-payroll has 14
+    try {
+      return fs.readFileSync(`/proc/${pid}/comm`, 'utf8').trim().toLowerCase() === name;
+    } catch {
+      return false;
+    }
   }
   const out = (await run('ps', ['-p', String(pid), '-o', 'comm='])).trim();
   return path.basename(out).toLowerCase() === name;
@@ -245,7 +255,9 @@ class ServerManager extends EventEmitter {
     if (stopToken) env[s.stopEnv] = stopToken;
     let proc;
     try {
-      proc = spawn(exe, args, { cwd: data, env, stdio: ['ignore', fd, fd], windowsHide: true });
+      // detached on Linux: its own process group, so closing the terminal SerieX was started from
+      // does not kill the servers before their backup; SerieX stops them itself.
+      proc = spawn(exe, args, { cwd: data, env, stdio: ['ignore', fd, fd], windowsHide: true, detached: IS_LINUX });
     } finally {
       fs.closeSync(fd);
     }

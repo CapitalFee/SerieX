@@ -12,7 +12,7 @@
 - **No account, no sign-up.** You never create an online account to use SerieX.
 - **Nothing is sent anywhere.** SerieX has no usage tracking, no analytics, no ads and no automatic crash reports. It does not check for updates in the background; you update when you choose to. If you choose to connect an AI assistant to SerieX, the assistant reads your books, and what it reads goes to the company that runs the assistant.
 - **Only your own computer can reach it.** The two helper programs inside SerieX listen only on `127.0.0.1`, an address that other computers on your network or on the internet cannot reach. Other programs and other user accounts on the same computer can reach them, so give your company files passwords.
-- **Company files are not encrypted.** They hold your books and, for payroll, employees' Social Security numbers and bank details. Protect them like paper records: use a login password on your computer, turn on FileVault (Mac) or BitLocker or Device Encryption (Windows), set passwords for SerieX users, and keep backup copies somewhere safe.
+- **Company files are not encrypted.** They hold your books and, for payroll, employees' Social Security numbers and bank details. Protect them like paper records: use a login password on your computer, turn on FileVault (Mac), BitLocker or Device Encryption (Windows), or disk encryption (Ubuntu, which you choose when you install Ubuntu), set passwords for SerieX users, and keep backup copies somewhere safe.
 
 ## Not tax, legal or accounting advice
 
@@ -39,7 +39,7 @@ In plain words:
 
 QuickBooks is a registered trademark of Intuit Inc., registered in the United States and other countries. SerieX is an independent project and is not affiliated with, endorsed by, or sponsored by Intuit Inc.
 
-Apple, Mac and macOS are trademarks of Apple Inc. Microsoft and Windows are trademarks of the Microsoft group of companies. SerieX is not affiliated with, endorsed by, or sponsored by Apple Inc. or Microsoft Corporation.
+Apple, Mac and macOS are trademarks of Apple Inc. Microsoft and Windows are trademarks of the Microsoft group of companies. Ubuntu is a registered trademark of Canonical Ltd. Linux is the registered trademark of Linus Torvalds in the U.S. and other countries. SerieX is not affiliated with, endorsed by, or sponsored by Apple Inc., Microsoft Corporation or Canonical Ltd.
 
 Other product names mentioned in this project, such as Claude, ChatGPT, Codex, Grok, Cursor, Visual Studio Code, LM Studio and Python, are trademarks of their respective owners. SerieX is not affiliated with, endorsed by, or sponsored by any of them.
 

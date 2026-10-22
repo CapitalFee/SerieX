@@ -14,6 +14,7 @@ const { ServerManager, SERVERS } = require('./servers');
 const { log } = logger;
 const IS_MAC = process.platform === 'darwin';
 const IS_WIN = process.platform === 'win32';
+const IS_LINUX = process.platform === 'linux';
 const APP_ID = 'com.seriex.desktop';
 const START_TIMEOUT_MS = 30000;
 const ZOOM_MIN = -3;
@@ -23,8 +24,8 @@ const COPYRIGHT = '© 2026 SerieX contributors';
 const LICENSE_TEXT = 'Free software under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)';
 
 // ---- data folder: <app data>/SerieX (SERIEX_DATA_DIR overrides it, e.g. for tests) ----
-// On macOS it is made 0700 (only this user), and tightened to 0700 when it is more open.
-// Everything this process and the servers it starts create (company files, backups, logs,
+// On macOS and Linux it is made 0700 (only this user), and tightened to 0700 when it is more
+// open. Everything this process and the servers it starts create (company files, backups, logs,
 // saved exports) is private to the user signed in to the computer: 0600 files and 0700
 // folders, whatever mode a program asks for (the servers inherit this setting). Windows has
 // no such permission bits.
@@ -54,6 +55,13 @@ function resourcesPaths() {
   const goarch = process.arch === 'x64' ? 'amd64' : process.arch;
   const build = path.join(__dirname, '..', 'build');
   return { binDir: path.join(build, 'servers', `${goos}-${goarch}`), webDir: build };
+}
+
+/** Linux only: the window icon as a PNG (Mac and Windows show the app's own icon). */
+function windowIcon() {
+  if (!IS_LINUX) return undefined;
+  const f = app.isPackaged ? path.join(process.resourcesPath, 'icon.png') : path.join(__dirname, '..', 'build', 'icons', '256x256.png');
+  return fs.existsSync(f) ? f : undefined;
 }
 
 // ---- addresses ----
@@ -168,6 +176,7 @@ async function reload(win) {
 function createMainWindow(url) {
   const saved = settings.get('window', null);
   const others = mainWindows();
+  const icon = windowIcon();
   const opts = {
     width: 1360,
     height: 860,
@@ -176,6 +185,7 @@ function createMainWindow(url) {
     show: false,
     title: 'SerieX',
     backgroundColor: '#ffffff',
+    ...(icon ? { icon } : {}),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -547,7 +557,7 @@ async function boot() {
   });
   menu.install(menuCtx);
   setupSession();
-  splash.show();
+  splash.show(windowIcon());
 
   const { binDir, webDir } = resourcesPaths();
   state.servers = new ServerManager({ dataDir, logsDir, binDir, webDir });
@@ -565,7 +575,7 @@ async function boot() {
         app.quit();
         return;
       }
-      splash.show();
+      splash.show(windowIcon());
     }
   }
   state.ready = true;
@@ -598,7 +608,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on('window-all-closed', () => {
-    // macOS keeps the app (and its servers) running until Quit; Windows quits with the last window.
+    // macOS keeps the app (and its servers) running until Quit; Windows and Linux quit with the last window.
     if (!IS_MAC || !state.ready) app.quit();
   });
 
@@ -627,6 +637,20 @@ if (!app.requestSingleInstanceLock()) {
     process.on(sig, () => {
       log(`received ${sig}; quitting`);
       app.quit();
+    });
+  }
+  // Linux only: Electron answers the first of these signals itself (the normal quit), but then
+  // lets the next one end SerieX at once, with no question about unsaved changes, no server stop,
+  // and helper processes left behind. That happens when a quit was cancelled (Cancel in "Some
+  // windows have unsaved changes") and SerieX is asked to quit again, for example by the install
+  // command. So once Electron is ready, the handlers above take these signals back, for good.
+  if (IS_LINUX) {
+    app.whenReady().then(() => {
+      for (const sig of ['SIGTERM', 'SIGINT', 'SIGHUP']) {
+        const handlers = process.listeners(sig);
+        process.removeAllListeners(sig);
+        for (const h of handlers) process.on(sig, h);
+      }
     });
   }
   process.on('uncaughtException', (e) => log('uncaught error', e));

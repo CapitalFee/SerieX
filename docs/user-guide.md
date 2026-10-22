@@ -17,11 +17,13 @@ How to install SerieX is in the [README](../README.md#install). This guide cover
 
 **Windows:** the command downloads SerieX from the latest release, checks it against the `SHA256SUMS` file, installs it for your user account only in `%LOCALAPPDATA%\Programs\SerieX`, adds it to the Start menu and opens it. It unblocks the downloaded files, so Windows does not show its usual warning for apps from the internet. You do not need administrator rights.
 
+**Ubuntu:** the command downloads the SerieX package for your computer from the latest release, checks it against the `SHA256SUMS` file, and installs it with apt, Ubuntu's own app installer. apt needs your password, so the command asks for it once; only that step runs as administrator. SerieX goes into `/opt/SerieX` and appears in your apps, and apt adds any parts of Ubuntu that SerieX needs and that are missing. Then SerieX opens. To open it later, press the **Super** key (the one with the Windows logo) and type `SerieX`.
+
 Only run the command if you trust this project.
 
 ## Updating
 
-Run the same install command again. It closes SerieX, replaces it with the newest version and keeps your company files. Save your work first. On a Mac, the update stops if a window still has unsaved changes, so you can save them.
+Run the same install command again. It closes SerieX, replaces it with the newest version and keeps your company files. Save your work first. On a Mac and on Ubuntu, the update stops if a window still has unsaved changes, so you can save them.
 
 If you installed from a downloaded file, download the new file and install it the same way.
 
@@ -31,6 +33,7 @@ SerieX keeps your books in this folder:
 
 - **Mac:** `~/Library/Application Support/SerieX` (in Finder, choose **Go > Go to Folder** and paste this path)
 - **Windows:** `%APPDATA%\SerieX` (paste this into the address bar of File Explorer)
+- **Ubuntu:** `~/.config/SerieX`, a hidden folder (in **Files**, press **Ctrl+L**, paste this path and press **Enter**)
 
 You can also right-click an empty spot of the SerieX window and choose **Open Data Folder**.
 
@@ -74,6 +77,7 @@ You can let an AI assistant on the same computer read your books and answer ques
 
 - Click **AI Assistants** in the left sidebar to turn it on. It is set per company file, is off until an administrator turns it on, and can only look unless an administrator also allows changes.
 - It works with assistant apps that run on your computer: the Claude desktop app and Claude Code, the ChatGPT desktop app (Work and Codex modes) and Codex, Grok Build, and other desktop apps that support the Model Context Protocol, such as Cursor, VS Code and LM Studio. The **AI Assistants** window shows the steps for each one. For the Claude desktop app, the **Set up Claude for me** button does it for you. Each release also includes the SerieX extension for Claude (a `.mcpb` file you can double-click to install).
+- On Ubuntu, SerieX works with Claude Code, Codex, Grok Build, Cursor, VS Code and LM Studio. The `.mcpb` extension is for the Claude desktop app on Mac and Windows.
 - The web and phone versions of these assistants cannot reach SerieX, because SerieX only runs on your own computer.
 - What the assistant reads is sent to the company that runs it, unless the assistant app runs the AI model on your own computer, as LM Studio can. Transactions an assistant saves are recorded in the audit trail under the SerieX user it works as, marked "(AI assistant)".
 
@@ -101,6 +105,12 @@ On a Mac, this Terminal command does it for Claude Code. For Codex, change `.cla
 mkdir -p ~/.claude/skills && curl -fsSL -o /tmp/seriex.skill https://github.com/CapitalFee/SerieX/releases/latest/download/seriex.skill && unzip -oq /tmp/seriex.skill -d ~/.claude/skills
 ```
 
+On Ubuntu, use this command instead. For Codex, again change `.claude` to `.agents`.
+
+```bash
+mkdir -p ~/.claude/skills && wget -qO /tmp/seriex.skill https://github.com/CapitalFee/SerieX/releases/latest/download/seriex.skill && python3 -m zipfile -e /tmp/seriex.skill ~/.claude/skills
+```
+
 If you have the SerieX source code, you can copy its `skills/seriex` folder there instead. On Windows, the folders are in your user folder (`%USERPROFILE%\.claude\skills` and `%USERPROFILE%\.agents\skills`), and `seriex.skill` is a ZIP file, so rename it to `seriex.zip` to unzip it. Start a new session afterwards.
 
 #### Good to know
@@ -126,6 +136,13 @@ Your company files are kept in all cases.
   ```
 
 - **Windows:** open **Settings > Apps > Installed apps** (on Windows 10: **Settings > Apps > Apps & features**), find **SerieX** and choose **Uninstall**.
+- **Ubuntu:** run this in Terminal:
+
+  ```bash
+  wget -qO- https://github.com/CapitalFee/SerieX/releases/latest/download/install.sh | bash -s -- --uninstall
+  ```
+
+  Or quit SerieX and run `sudo apt remove seriex`.
 
 If you no longer need your company files either, delete the folder listed in [Your company files](#your-company-files).
 
@@ -138,7 +155,12 @@ If you no longer need your company files either, delete the folder listed in [Yo
   curl -fsSL https://github.com/CapitalFee/SerieX/releases/latest/download/install.sh | SERIEX_INSTALL_DIR="$HOME/Applications" bash
   ```
 
-- **Do not run the Mac command with `sudo`.** It does not need administrator rights, and it stops if you run it with sudo.
-- **The Mac command says SerieX is still open.** A window probably has unsaved changes. Save your work, quit SerieX, and run the command again.
+- **Do not run the Mac or Ubuntu command with `sudo`.** On a Mac it does not need administrator rights. On Ubuntu it asks for your password itself when it needs it. It stops if you run it with sudo.
+- **The Mac or Ubuntu command says SerieX is still open.** A window probably has unsaved changes. Save your work, quit SerieX, and run the command again.
+- **Ubuntu says `curl: command not found`.** Use the `wget` command from the [README](../README.md#ubuntu) instead.
+- **The Ubuntu command says "Ubuntu did not allow it".** Check the password first: it is the one you use to log in. If it is right, your account is not an administrator of the computer, and only an administrator can install apps. Ask the person who manages the computer to install SerieX, or to make your account an administrator in **Settings > Users** (on Ubuntu 24.04: **Settings > System > Users**).
+- **The Ubuntu command waits, or stops, while Ubuntu installs updates.** Wait until **Software Updater** is done, then run the command again.
+- **The Ubuntu command says SerieX is open for another user.** Ask them to save their work and quit SerieX, then run the command again.
+- **The Ubuntu command says to run it in the Terminal app.** It needs a Terminal window to ask for your password. Press **Ctrl+Alt+T** to open Terminal and paste the command there.
 - **SerieX starts but stays on a loading screen.** Quit SerieX completely and open it again. SerieX runs two small helper programs on your computer, one for SerieX Books and one for SerieX Payroll. They only accept connections from your own computer, and if their usual ports are busy, SerieX picks free ones by itself.
 - **Still stuck?** [Open an issue](https://github.com/CapitalFee/SerieX/issues) and say what you did and what you saw. The log can help: right-click an empty spot of the SerieX window and choose **Show Logs**. Check that it holds nothing private before you share it.

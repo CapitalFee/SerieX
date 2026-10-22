@@ -1,25 +1,39 @@
 #!/usr/bin/env bash
-# Installs or updates SerieX (SerieX Books and SerieX Payroll) on a Mac.
+# Installs or updates SerieX (SerieX Books and SerieX Payroll) on a Mac or on Ubuntu Linux.
 #
-#   curl -fsSL https://github.com/CapitalFee/SerieX/releases/latest/download/install.sh | bash
+#   Mac:     curl -fsSL https://github.com/CapitalFee/SerieX/releases/latest/download/install.sh | bash
+#   Ubuntu:  wget -qO- https://github.com/CapitalFee/SerieX/releases/latest/download/install.sh | bash
 #
 # Options (add them after "bash -s --" when piping):
 #   --uninstall        remove the SerieX app (your company files are kept)
 #   --version <tag>    install a specific release, for example v2026.10.3
 #
 # Environment:
-#   SERIEX_INSTALL_DIR  folder to install SerieX.app into (default: /Applications when you can
-#                       write to it, else ~/Applications)
+#   SERIEX_INSTALL_DIR  Mac only: folder to install SerieX.app into (default: /Applications when
+#                       you can write to it, else ~/Applications)
 #   SERIEX_NO_LAUNCH=1  do not open SerieX when the installation is done
+#   SERIEX_RELEASE_URL  Ubuntu, for testing: a web folder with the release files to use instead
+#                       of GitHub
 #
-# The script never uses sudo and never touches your company files, which are kept in
-# ~/Library/Application Support/SerieX.
+# On a Mac the script never uses sudo. On Ubuntu it installs the SerieX package with apt, and only
+# that step runs with sudo, which asks for your password. Your company files are never touched;
+# they are kept in ~/Library/Application Support/SerieX (Mac) or ~/.config/SerieX (Ubuntu).
 
 set -euo pipefail
 
 REPO_URL="https://github.com/CapitalFee/SerieX"
 APP_NAME="SerieX.app"
-DATA_DIR="${SERIEX_DATA_DIR:-$HOME/Library/Application Support/SerieX}" # the app reads SERIEX_DATA_DIR too
+# The app reads SERIEX_DATA_DIR too. The same rule as desktop/src/main.js, mcp/seriexmcp/locate.go
+# and skills/seriex/scripts/seriex.py.
+case "$(uname -s)" in
+  Darwin) DATA_DIR="${SERIEX_DATA_DIR:-$HOME/Library/Application Support/SerieX}" ;;
+  *) DATA_DIR="${SERIEX_DATA_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/SerieX}" ;;
+esac
+# Ubuntu: these match deb.packageName and linux.executableName in desktop/scripts/build.mjs.
+LINUX_PACKAGE="seriex"
+LINUX_APP="/opt/SerieX/seriex"
+LINUX_ARCHS="amd64 arm64"
+LINUX_FIRST="2026.10.4" # the first release with Ubuntu packages
 
 WORK_DIR=""
 STAGING_DIR=""
@@ -181,8 +195,197 @@ install() {
   fi
 }
 
+# ---- Ubuntu ----
+
+# Downloads $1 into $2, with a progress bar when $3 is set. wget first: Ubuntu has it, and a curl
+# installed as a snap cannot write to /tmp.
+fetch() {
+  local url="$1" out="$2" progress="${3:-}" opts=(-q --tries=3)
+  if command -v wget >/dev/null 2>&1; then
+    if [ -n "$progress" ]; then
+      case "$(wget --help 2>&1 || true)" in *--show-progress*) opts+=(--show-progress) ;; esac
+    fi
+    wget "${opts[@]}" -O "$out" "$url"
+  elif command -v curl >/dev/null 2>&1; then
+    if [ -n "$progress" ]; then
+      curl -fL --progress-bar --retry 3 -o "$out" "$url"
+    else
+      curl -fsSL --retry 3 -o "$out" "$url"
+    fi
+  else
+    fail "wget and curl are both missing. Install wget with: sudo apt install wget"
+  fi
+}
+
+linux_checks() {
+  if grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
+    say "This is Linux inside Windows (WSL). Install SerieX for Windows instead. In PowerShell, run:"
+    say "  irm $REPO_URL/releases/latest/download/install.ps1 | iex"
+    exit 1
+  fi
+  { command -v apt-get && command -v dpkg; } >/dev/null 2>&1 ||
+    fail "this Linux has no apt (Ubuntu's app installer). SerieX for Linux is made for Ubuntu 22.04 or later."
+  command -v sudo >/dev/null 2>&1 || fail "sudo is missing, so this setup cannot ask for permission to install SerieX."
+  command -v pgrep >/dev/null 2>&1 || fail "pgrep is missing. Install it with: sudo apt install procps"
+  [ -z "${SERIEX_INSTALL_DIR:-}" ] ||
+    fail "SERIEX_INSTALL_DIR works on a Mac only. On Ubuntu, SerieX always goes into /opt/SerieX. Run the command without it."
+  # shellcheck disable=SC1091 # /etc/os-release is read on the user's computer
+  case "$(. /etc/os-release 2>/dev/null; printf '%s %s' "${ID:-}" "${VERSION_ID:-}")" in
+    "ubuntu 2"[2-9].* | "ubuntu "[3-9][0-9].*) ;;
+    *) say "Note: SerieX is made for Ubuntu 22.04 or later. It may not work on $(. /etc/os-release 2>/dev/null; printf '%s' "${PRETTY_NAME:-this Linux}")." ;;
+  esac
+}
+
+# amd64 or arm64, the name part of SerieX-linux-<name>.deb.
+linux_arch() {
+  local a
+  a="$(dpkg --print-architecture)"
+  case " $LINUX_ARCHS " in
+    *" $a "*) printf '%s\n' "$a" ;;
+    *) fail "SerieX for Linux needs a 64-bit processor (Intel or AMD, or 64-bit ARM); this computer is $a." ;;
+  esac
+}
+
+linux_status() { dpkg-query -W -f='${Status}' "$LINUX_PACKAGE" 2>/dev/null || true; }
+
+# This user's SerieX main processes. Its helper processes have the same name and a --type= option.
+# A helper rewrites its command line as one text with spaces ("/opt/SerieX/seriex --type=zygote"),
+# so the option is looked for anywhere in it. A process that is already gone is skipped.
+serie_pids_linux() {
+  local pid args
+  for pid in $(pgrep -u "$(id -u)" -x "${LINUX_APP##*/}" 2>/dev/null || true); do
+    args="$(tr '\0' ' ' 2>/dev/null <"/proc/$pid/cmdline")" || continue
+    case " $args" in
+      *" --type="*) ;;
+      *) printf '%s\n' "$pid" ;;
+    esac
+  done
+}
+
+# Asks a running SerieX to quit the normal way (the TERM signal: it asks about unsaved changes and
+# stops its servers after their backup), and waits up to 15 seconds. Stops the setup if SerieX is
+# still open, or if another user of this computer has it open. Only the main process counts:
+# helper processes that a crashed SerieX left behind do not keep the setup from going on.
+quit_serie_linux() {
+  local exe="${LINUX_APP##*/}" me pid waited=0
+  me="$(id -u)"
+  # another user's main SerieX process (helpers that a crashed SerieX left behind do not count)
+  if ps -C "$exe" -o uid=,args= 2>/dev/null | awk -v me="$me" '$1 != me && $0 !~ / --type=/ { found = 1 } END { exit !found }'; then
+    fail "SerieX is open for another user of this computer. Ask them to save their work and quit SerieX, then run this again."
+  fi
+  [ -n "$(serie_pids_linux)" ] || return 0
+  say "SerieX is open. Asking it to quit..."
+  for pid in $(serie_pids_linux); do kill -TERM "$pid" 2>/dev/null || true; done
+  while [ "$waited" -lt 30 ]; do
+    [ -n "$(serie_pids_linux)" ] || return 0
+    sleep 0.5
+    waited=$((waited + 1))
+  done
+  fail "SerieX is still open (a window may have unsaved changes). Save your work, quit SerieX, and run this again."
+}
+
+# Asks for the password once ($1: install or remove). sudo reads it from the terminal itself; this
+# script never sees it.
+linux_sudo() {
+  sudo -n true 2>/dev/null && return 0
+  { : </dev/tty; } 2>/dev/null || fail "run this command in the Terminal app, so that it can ask for your password."
+  say "To $1 SerieX, Ubuntu needs your password (the one you use to log in to this computer)."
+  say "Type it and press Enter. You may not see anything while you type; that is normal."
+  # shellcheck disable=SC2024 # on purpose: sudo itself reads the password from the terminal
+  sudo -v </dev/tty ||
+    fail "Ubuntu did not allow it. Check the password and run the command again. If your account is not an administrator of this computer, ask the person who manages it."
+}
+
+# Runs apt-get as administrator; its messages go to the log file $1.
+apt_logged() {
+  local log="$1"
+  shift
+  # shellcheck disable=SC2024 # on purpose: the log file belongs to the user
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get -y -q -o DPkg::Lock::Timeout=120 "$@" </dev/null >>"$log" 2>&1
+}
+
+install_linux() {
+  local tag="$1" arch base asset deb sums log expected actual version
+  arch="$(linux_arch)"
+  if [ -n "${SERIEX_RELEASE_URL:-}" ]; then
+    base="${SERIEX_RELEASE_URL%/}"
+  elif [ -n "$tag" ]; then
+    base="$REPO_URL/releases/download/$tag"
+  else
+    base="$REPO_URL/releases/latest/download"
+  fi
+  asset="SerieX-linux-$arch.deb"
+
+  linux_sudo install # before the download: someone who cannot install learns it at once
+
+  WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/seriex-setup.XXXXXX")"
+  chmod 755 "$WORK_DIR" # apt reads the package as its own _apt user
+  deb="$WORK_DIR/$asset"
+  sums="$WORK_DIR/SHA256SUMS"
+  log="$WORK_DIR/apt.log"
+
+  say "Downloading SerieX${tag:+ $tag} for Ubuntu..."
+  fetch "$base/$asset" "$deb" progress ||
+    fail "could not download $base/$asset${tag:+ (releases before SerieX $LINUX_FIRST have no Ubuntu version)}"
+  chmod 644 "$deb"
+  fetch "$base/SHA256SUMS" "$sums" || fail "could not download $base/SHA256SUMS"
+
+  say "Checking the download..."
+  expected="$(awk -v f="$asset" '$2 == f || $2 == "*" f { print tolower($1); exit }' "$sums")"
+  [ -n "$expected" ] || fail "SHA256SUMS does not list $asset."
+  actual="$(sha256sum "$deb" | awk '{ print tolower($1) }')"
+  [ "$expected" = "$actual" ] || fail "the download is damaged (its SHA-256 checksum does not match). Please try again."
+
+  quit_serie_linux
+  linux_sudo install # again: sudo forgets the password after 15 minutes (a slow download)
+
+  say "Installing SerieX. This can take a minute..."
+  # --reinstall: running the command again repairs SerieX; --allow-downgrades: --version can go back;
+  # --no-remove: stop rather than remove another package to make room for SerieX
+  if ! apt_logged "$log" install --no-remove --reinstall --allow-downgrades "$deb"; then
+    say "Updating the list of Ubuntu packages and trying again..."
+    apt_logged "$log" update || true
+    if ! apt_logged "$log" install --no-remove --reinstall --allow-downgrades "$deb"; then
+      tail -n 15 "$log" >&2
+      fail "Ubuntu could not install SerieX (its messages are above). If Ubuntu is installing updates right now, wait until it is done and run this again."
+    fi
+  fi
+
+  version="$(dpkg-query -W -f='${Version}' "$LINUX_PACKAGE" 2>/dev/null || echo '')"
+  say "SerieX ${version:+$version }is installed. To open it later, press the Super (Windows) key and type SerieX."
+  say "Your company files are kept in: $DATA_DIR"
+
+  if [ "${SERIEX_NO_LAUNCH:-}" != 1 ] && [ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]; then
+    say "Opening SerieX..."
+    # setsid: SerieX keeps running when this Terminal window is closed
+    setsid -f "$LINUX_APP" </dev/null >/dev/null 2>&1 || say "Open SerieX from your apps."
+  fi
+}
+
+uninstall_linux() {
+  local log
+  quit_serie_linux
+  case "$(linux_status)" in
+    "" | *not-installed | *config-files) say "SerieX is not installed." ;;
+    *)
+      linux_sudo remove
+      WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/seriex-setup.XXXXXX")"
+      log="$WORK_DIR/apt.log"
+      say "Removing SerieX..."
+      if ! apt_logged "$log" remove "$LINUX_PACKAGE"; then
+        tail -n 15 "$log" >&2
+        fail "Ubuntu could not remove SerieX (its messages are above)."
+      fi
+      say "SerieX was removed."
+      ;;
+  esac
+  say "Your company files were not touched. They are kept in:"
+  say "  $DATA_DIR"
+  say "Delete that folder only if you no longer need your SerieX company files."
+}
+
 main() {
-  local mode=install tag=""
+  local mode=install tag="" os
   while [ $# -gt 0 ]; do
     case "$1" in
       --uninstall) mode=uninstall ;;
@@ -204,15 +407,23 @@ main() {
     shift
   done
 
-  if [ "$(uname -s)" != Darwin ]; then
-    say "This installer is for macOS. SerieX is available for macOS and Windows."
-    say "On Windows, run this in PowerShell:"
-    say "  irm $REPO_URL/releases/latest/download/install.ps1 | iex"
-    exit 1
-  fi
+  case "$(uname -s)" in
+    Darwin) os=mac ;;
+    Linux) os=linux ;;
+    *)
+      say "This installer is for macOS and Ubuntu Linux."
+      say "On Windows, run this in PowerShell:"
+      say "  irm $REPO_URL/releases/latest/download/install.ps1 | iex"
+      exit 1
+      ;;
+  esac
   if [ "$(id -u)" = 0 ]; then
+    if [ "$os" = linux ]; then
+      fail "please run this as yourself, without sudo. It asks for your password when it needs it."
+    fi
     fail "please run this as yourself, without sudo."
   fi
+  [ "$os" = mac ] || linux_checks
 
   case "$tag" in
     [0-9]*) tag="v$tag" ;; # 2026.10.3 means the release v2026.10.3
@@ -220,7 +431,13 @@ main() {
 
   trap cleanup EXIT
   trap 'exit 130' INT TERM
-  if [ "$mode" = uninstall ]; then
+  if [ "$os" = linux ]; then
+    if [ "$mode" = uninstall ]; then
+      uninstall_linux
+    else
+      install_linux "$tag"
+    fi
+  elif [ "$mode" = uninstall ]; then
     uninstall
   else
     install "$tag"

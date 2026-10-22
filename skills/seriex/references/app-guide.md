@@ -66,6 +66,7 @@ slightly different, trust the screen.
 - Company files and logs (desktop app):
   - Mac: `~/Library/Application Support/SerieX` (Finder: Go > Go to Folder).
   - Windows: `%APPDATA%\SerieX` (paste in File Explorer's address bar).
+  - Ubuntu: `~/.config/SerieX` (Files: Ctrl+L, paste the path).
   - Books company files are in the `books` subfolder (`<id>.sxb`), automatic backups in
     `books/backups/<company>`, payroll files in `payroll`, logs in `logs`.
   - Fast way: right-click an empty spot of the SerieX window > **Open Data Folder** or
@@ -77,13 +78,13 @@ slightly different, trust the screen.
     Screen), **Go** (SerieX Books Cmd+1, SerieX Payroll Cmd+2), **Window** (Minimize, Zoom,
     Close Window, Bring All to Front), **Help** (**Open Data Folder**, **Show Logs**,
     **License**, **Third-Party Notices**).
-  - **Windows**: no native menu bar (the page draws its own). Use the keys in 2.12 and the
-    right-click menu.
-  - **Right-click on an empty spot** (both systems): SerieX Books (Ctrl/Cmd+1), SerieX Payroll
-    (Ctrl/Cmd+2), Reload (F5 on Windows, Cmd+R on Mac), Zoom ▸ (Actual Size, Zoom In, Zoom Out),
-    Full Screen (F11) / Toggle Full Screen (Ctrl+Cmd+F), **Open Data Folder**, **Show Logs**, and
-    on Windows **License**, **Third-Party Notices** and **About SerieX**. Right-click in a text
-    field gives Undo, Redo, Cut, Copy, Paste, Select All.
+  - **Windows and Linux**: no native menu bar (the page draws its own). Use the keys in 2.12 and
+    the right-click menu.
+  - **Right-click on an empty spot** (all systems): SerieX Books (Ctrl/Cmd+1), SerieX Payroll
+    (Ctrl/Cmd+2), Reload (F5 on Windows and Linux, Cmd+R on Mac), Zoom ▸ (Actual Size, Zoom In,
+    Zoom Out), Full Screen (F11) / Toggle Full Screen (Ctrl+Cmd+F), **Open Data Folder**,
+    **Show Logs**, and on Windows and Linux **License**, **Third-Party Notices** and
+    **About SerieX**. Right-click in a text field gives Undo, Redo, Cut, Copy, Paste, Select All.
   - Reload, switching app and closing the window ask first when a window has unsaved changes.
 
 ### 2.2 Window layout (Books; Payroll has the same frame)
@@ -185,7 +186,7 @@ Postings, Payroll Journal, Preferences).
   button is hidden when the server has no Payroll address (for example a source run started
   without `-payroll`).
 - Other ways: File > Switch to SerieX Payroll... (Books) / File > Switch to SerieX Books...
-  (Payroll); desktop app Ctrl+1 / Ctrl+2 (Windows) or Cmd+1 / Cmd+2 (Mac).
+  (Payroll); desktop app Ctrl+1 / Ctrl+2 (Windows and Linux) or Cmd+1 / Cmd+2 (Mac).
 
 ### 2.5 + New button
 
@@ -317,6 +318,7 @@ buttons (section 6).
 
 ### 2.12 Keyboard shortcuts (Windows and Mac)
 
+On Linux, the keys are the same as in the Windows column.
 On a Mac, the app's own shortcuts use the **Control** key (⌃), not Command, except the few rows
 that say Cmd. Alt is the **Option** key (⌥). Shortcuts work only when a company is open and no
 dialog is on top (except Esc, F1, Ctrl+Tab, Ctrl+F4).
@@ -1466,8 +1468,9 @@ Buttons **OK** / **Cancel**.
 The screens do not refresh by themselves after changes made through the API. Windows that were
 already open keep showing old data. Tell the user to close and reopen the window, or click
 **Refresh** (Home, reports, registers, Reminders, Books Sync), or reload the page (F5 on
-Windows, Cmd+R on Mac, or right-click > Reload). The **Recent transactions** lists only hold
-transactions opened in that browser, not ones created by the API: use the search box instead.
+Windows and Linux, Cmd+R on Mac, or right-click > Reload). The **Recent transactions** lists
+only hold transactions opened in that browser, not ones created by the API: use the search box
+instead.
 
 | Created or changed through the API | Where the user sees it |
 |---|---|

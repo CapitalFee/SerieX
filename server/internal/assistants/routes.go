@@ -53,6 +53,7 @@ type setupFileJSON struct {
 	File       string `json:"file"`
 	Exists     bool   `json:"exists"`
 	Configured bool   `json:"configured"`
+	AppFound   *bool  `json:"appFound,omitempty"` // Linux only: Claude's settings folder exists on this computer (left out on Mac and Windows)
 }
 
 type setupJSON struct {
@@ -484,6 +485,11 @@ func (s *Service) setupApp(c *httpx.Ctx) error {
 	var err error
 	switch in.Target {
 	case targetClaude:
+		// the Claude desktop app is made for Mac and Windows: on Linux, SerieX
+		// writes its settings only when Claude's settings folder is there
+		if found := claudeStatus(s.helper.path, s.helper.args).AppFound; runtime.GOOS == "linux" && (found == nil || !*found) {
+			return apperr.Conflict("SerieX did not find the Claude desktop app on this computer. On Linux, use Claude Code: the AI Assistants window shows its command.")
+		}
 		res, err = setupClaude(s.helper.path, s.helper.args)
 	case targetCodex:
 		res, err = setupCodex(s.helper.path, s.helper.args)

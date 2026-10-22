@@ -1,7 +1,7 @@
 // Native menus, keyboard shortcuts and the right-click menu.
 // macOS: the usual menu bar (SerieX, Edit, View, Go, Window, Help); the Edit menu is what makes
 // Cmd+C / Cmd+V / Cmd+Z work in text fields there.
-// Windows: no native menu bar, because both apps draw their own menu bar inside the page and use
+// Windows and Linux: no native menu bar, because both apps draw their own menu bar inside the page and use
 // Alt, F10, Ctrl+R, Ctrl+W and other Ctrl keys themselves. The SerieX commands are reached with
 // the shortcuts below and with a right-click on an empty spot of the page.
 'use strict';
@@ -97,7 +97,7 @@ function install(ctx) {
 }
 
 /**
- * Windows shortcuts (there is no native menu there). Returns true when the key was used.
+ * Windows and Linux shortcuts (there is no native menu there). Returns true when the key was used.
  * Ctrl+1 / Ctrl+2 switch app, Ctrl+= / Ctrl+- / Ctrl+0 zoom, F11 full screen, F5 reload,
  * Ctrl+Shift+I developer tools (development builds only).
  */

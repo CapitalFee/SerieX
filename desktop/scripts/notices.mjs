@@ -37,6 +37,8 @@ export const DEFAULT_TARGETS = [
   { goos: 'darwin', goarch: 'arm64' },
   { goos: 'darwin', goarch: 'amd64' },
   { goos: 'windows', goarch: 'amd64' },
+  { goos: 'linux', goarch: 'amd64' },
+  { goos: 'linux', goarch: 'arm64' },
 ];
 
 const RULE = '='.repeat(80);
@@ -203,8 +205,8 @@ function header({ appVersion }) {
     '',
     'The desktop app is built on Electron, which includes Chromium, Node.js and other software.',
     'Their notices are in the app\'s own license files: LICENSE.electron.txt and',
-    'LICENSES.chromium.html, next to SerieX.exe on Windows and in SerieX.app/Contents/Resources',
-    'on macOS.',
+    'LICENSES.chromium.html, next to SerieX.exe on Windows, in /opt/SerieX on Ubuntu, and in',
+    'SerieX.app/Contents/Resources on macOS.',
     '',
   ];
 }

@@ -744,6 +744,8 @@ export interface AiSetupFile {
   exists: boolean;
   /** The file already starts SerieX's helper program. */
   configured: boolean;
+  /** The app was found on this computer (missing from older servers). */
+  appFound?: boolean;
 }
 
 /** AI Assistants (GET/PUT /ai-assistants). */

@@ -180,7 +180,9 @@ func readRegular(path string, max int64) ([]byte, error) {
 }
 
 // claudeStatus: "configured" when the file Claude reads starts the helper
-// with the arguments this SerieX needs.
+// with the arguments this SerieX needs. On Linux, where the Claude desktop
+// app is not made, "appFound" only when Claude's settings folder exists
+// (~/.config/Claude, made by a Claude app for Linux).
 func claudeStatus(helper string, args []string) setupFileJSON {
 	var st setupFileJSON
 	path, _, err := claudeConfigFiles()
@@ -188,12 +190,22 @@ func claudeStatus(helper string, args []string) setupFileJSON {
 		return st
 	}
 	st.File = path
+	if runtime.GOOS == "linux" {
+		found := isDir(filepath.Dir(path))
+		st.AppFound = &found
+	}
 	data, exists, err := readConfig(path)
 	st.Exists = exists
 	if err == nil && exists {
 		st.Configured = claudeConfigured(data, helper, args)
 	}
 	return st
+}
+
+// isDir: path is a folder (or a link to one).
+func isDir(path string) bool {
+	fi, err := os.Stat(path)
+	return err == nil && fi.IsDir()
 }
 
 func codexStatus(helper string, args []string) setupFileJSON {
@@ -214,6 +226,14 @@ func codexStatus(helper string, args []string) setupFileJSON {
 const (
 	msgClaudeRestart = "Quit Claude completely and open it again."
 	msgCodexRestart  = "In ChatGPT open Settings, then MCP servers, and click Restart, or quit and reopen ChatGPT."
+)
+
+// On Linux, where the ChatGPT desktop app is not made: Codex is the codex
+// terminal app or the Codex extension in VS Code or Cursor, which read the
+// same settings file.
+const (
+	msgCodexRestartLinux   = "Close Codex and start it again (in VS Code or Cursor, reload the window). Then type /mcp to check that seriex is listed."
+	msgCodexUnchangedLinux = "Codex was already set up to use SerieX. If seriex is not listed, close Codex and start it again (in VS Code or Cursor, reload the window)."
 )
 
 func setupClaude(helper string, args []string) (setupResult, error) {
@@ -289,6 +309,12 @@ func setupCodex(helper string, args []string) (setupResult, error) {
 	msg := msgCodexRestart
 	if !changed {
 		msg = "ChatGPT and Codex were already set up to use SerieX. If SerieX is not listed, open Settings, then MCP servers, and click Restart, or quit and reopen ChatGPT."
+	}
+	if runtime.GOOS == "linux" {
+		msg = msgCodexRestartLinux
+		if !changed {
+			msg = msgCodexUnchangedLinux
+		}
 	}
 	return setupResult{File: path, Backup: backup, Message: msg, Result: resultOf(existed, changed)}, nil
 }
