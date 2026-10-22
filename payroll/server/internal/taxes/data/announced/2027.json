@@ -1,0 +1,16 @@
+{
+  "year": 2027,
+  "federal": {
+    "ssWageBase": 192300,
+    "limits": {
+      "hsaSelf": 4500,
+      "hsaFamily": 9000,
+      "hsaCatchUp": 1000
+    }
+  },
+  "sources": [
+    "https://www.ssa.gov/news/en/cola/factsheets/2027.html",
+    "https://www.irs.gov/pub/irs-drop/rp-26-24.pdf"
+  ],
+  "notes": "2027 values announced so far: social security wage base $192,300 (Social Security Administration, Oct 14, 2026; maximum tax $11,922.60 each side) and HSA limits $4,500 self-only / $9,000 family / $1,000 catch-up (Rev. Proc. 2026-24). The IRS has not published the 2027 Pub. 15-T or the 2027 retirement, FSA and transit limits; the 2026 amounts are used until then. FUTA credit reduction rates are set per year and start empty."
+}

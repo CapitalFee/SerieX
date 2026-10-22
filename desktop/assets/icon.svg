@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f8df9"/>
+      <stop offset="0.55" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="sheet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e8eefc"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#0b1f4d" flood-opacity="0.35"/>
+    </filter>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#0b1f4d" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <!-- tile: 824 x 824 on the 1024 canvas (macOS icon grid) -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#bg)"/>
+  </g>
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#gloss)"/>
+  <!-- ledger sheet -->
+  <g filter="url(#soft)">
+    <rect x="262" y="232" width="470" height="560" rx="54" fill="url(#sheet)"/>
+  </g>
+  <rect x="262" y="232" width="470" height="118" rx="54" fill="#dbe6fd"/>
+  <rect x="262" y="300" width="470" height="50" fill="#dbe6fd"/>
+  <circle cx="330" cy="291" r="20" fill="#2563eb"/>
+  <rect x="368" y="278" width="190" height="26" rx="13" fill="#2563eb" opacity="0.85"/>
+  <g stroke-linecap="round">
+    <path d="M318 430h358" stroke="#2563eb" stroke-width="34"/>
+    <path d="M318 520h358" stroke="#93b4f5" stroke-width="34"/>
+    <path d="M318 610h210" stroke="#93b4f5" stroke-width="34"/>
+    <path d="M318 700h150" stroke="#93b4f5" stroke-width="34"/>
+  </g>
+  <!-- check badge -->
+  <g filter="url(#soft)">
+    <circle cx="690" cy="690" r="148" fill="url(#badge)"/>
+  </g>
+  <circle cx="690" cy="690" r="148" fill="none" stroke="#ffffff" stroke-width="18"/>
+  <path d="M624 692l46 46 88-100" fill="none" stroke="#ffffff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

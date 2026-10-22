@@ -1,0 +1,42 @@
+{
+  "manifest_version": "0.3",
+  "name": "seriex",
+  "display_name": "SerieX",
+  "version": "0.0.0",
+  "description": "Lets Claude read your SerieX Books and SerieX Payroll company files on this computer, and make changes where an administrator allows them. SerieX must be open.",
+  "long_description": "SerieX is free, open-source accounting software for small businesses: SerieX Books (customers, vendors, items, invoices, bills, banking and reports) and SerieX Payroll (employees, paychecks and payroll taxes). This extension lets Claude work with the company files SerieX keeps on this computer.\n\n**Before you start**\n\n- Install SerieX from https://github.com/CapitalFee/SerieX and keep it open while you use Claude. This extension runs on macOS 12 or later and on 64-bit Windows 10 or later.\n- In SerieX Books, open the company file and click **AI Assistants** in the left sidebar. An administrator turns on **Let AI assistants use** the company file and chooses the SerieX user Claude works as. Claude sees only the company files shared there.\n\n**What Claude can do**\n\n- Look things up: company information, accounts and registers, customers, vendors, items, transactions, open invoices, unpaid bills, sales tax and reports. While SerieX Payroll is open, also employees, paychecks, payroll taxes and payroll reports. Full social security and bank account numbers are never shown.\n- Make changes only in company files where an administrator also turned on **Also allow changes**: add customers, vendors and items, create invoices, receive payments, enter and pay bills, write checks, record deposits and journal entries, and void transactions. Every transaction is saved as the chosen SerieX user and shows in the audit trail.\n- When SerieX asks a Yes/No question before saving (for example a check number that is already used), nothing is saved until you answer. Changes dated on or before the closing date can only be made in SerieX itself.\n\n**Privacy**\n\nThis extension only talks to SerieX on this computer, and SerieX sends nothing anywhere. Claude sends what it reads to Anthropic to answer you, like the rest of your conversation.\n\n**Setting**\n\nSerieX data folder: leave it empty unless you moved the SerieX data folder.",
+  "author": {
+    "name": "SerieX contributors",
+    "url": "https://github.com/CapitalFee/SerieX"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CapitalFee/SerieX"
+  },
+  "homepage": "https://github.com/CapitalFee/SerieX",
+  "support": "https://github.com/CapitalFee/SerieX/issues",
+  "icon": "icon.png",
+  "server": {
+    "type": "binary",
+    "entry_point": "server/seriex-mcp",
+    "mcp_config": {
+      "command": "${__dirname}/server/seriex-mcp",
+      "args": ["--data", "${user_config.data_folder}"]
+    }
+  },
+  "tools": [],
+  "keywords": ["accounting", "bookkeeping", "payroll", "invoices", "small business"],
+  "license": "AGPL-3.0-or-later",
+  "compatibility": {
+    "platforms": ["darwin"]
+  },
+  "user_config": {
+    "data_folder": {
+      "type": "directory",
+      "title": "SerieX data folder",
+      "description": "Leave empty unless you moved the SerieX data folder.",
+      "required": false,
+      "default": ""
+    }
+  }
+}

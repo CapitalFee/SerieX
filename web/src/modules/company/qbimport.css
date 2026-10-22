@@ -1,0 +1,332 @@
+/* QuickBooks Desktop import wizard (QuickBooksImport.tsx); uses the new company wizard layout (cx-wiz-*) */
+
+.qb-wizard .cx-section-title {
+  margin: 4px 0 6px;
+}
+.qb-busy {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+}
+.qb-empty {
+  padding: 28px 12px;
+  text-align: center;
+}
+.qb-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.qb-help {
+  padding: 10px 12px;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  background: #f8fafc;
+  line-height: 1.5;
+}
+.qb-help ol {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+.qb-help li + li {
+  margin-top: 3px;
+}
+
+/* file drop zones */
+.qb-drop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1.5px dashed #c3cdda;
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+.qb-drop.qb-over {
+  border-color: var(--sx-accent);
+  background: var(--sx-accent-soft);
+}
+.qb-drop.qb-has {
+  border-style: solid;
+  border-color: #b9d7c4;
+  background: #f4fbf6;
+}
+.qb-drop[aria-invalid='true'] {
+  border-color: var(--sx-danger);
+}
+.qb-drop-icon {
+  color: #64748b;
+  flex: 0 0 auto;
+}
+.qb-drop-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow-wrap: anywhere;
+}
+
+/* tables */
+.qb-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+.qb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.qb-table th {
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--sx-border);
+  white-space: nowrap;
+}
+.qb-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #f1f3f6;
+  vertical-align: top;
+}
+.qb-table .qb-num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.qb-table tfoot td {
+  border-bottom: 0;
+  border-top: 1px solid var(--sx-border);
+  font-weight: 600;
+}
+.qb-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.qb-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 170px;
+  padding: 8px 12px;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+}
+.qb-stat b {
+  font-size: 15px;
+}
+.qb-gap {
+  margin-top: 6px;
+}
+.qb-titlerow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.qb-red {
+  color: var(--sx-danger);
+}
+.qb-amber {
+  color: #b45309;
+}
+
+/* mapping review */
+.qb-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--sx-border);
+}
+.qb-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font: inherit;
+  color: #475569;
+  cursor: pointer;
+}
+.qb-tab.qb-on {
+  border-bottom-color: var(--sx-accent);
+  color: var(--sx-accent);
+  font-weight: 600;
+}
+.qb-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 8px;
+  margin-right: 8px;
+  border: 1px solid var(--sx-field-border);
+  border-radius: 6px;
+  color: #64748b;
+}
+.qb-search input {
+  border: 0;
+  outline: 0;
+  width: 150px;
+  font: inherit;
+  background: transparent;
+}
+.qb-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #fff7e6;
+  border: 1px solid #f6d48b;
+}
+.qb-bar.qb-bad {
+  background: #fdecec;
+  border-color: #f3b4b4;
+}
+.qb-mapwrap {
+  min-height: 0;
+}
+.qb-map td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.qb-map td:first-child {
+  width: 34%;
+  overflow-wrap: anywhere;
+}
+.qb-what {
+  width: 31%;
+}
+.qb-what > * + * {
+  margin-top: 4px;
+}
+.qb-what select,
+.qb-input {
+  width: 100%;
+}
+.qb-input {
+  height: var(--sx-control-h, 24px);
+  padding: 0 6px;
+  border: 1px solid var(--sx-field-border);
+  border-radius: 4px;
+  font: inherit;
+}
+.qb-input:focus {
+  outline: 0;
+  border-color: var(--sx-field-focus);
+  box-shadow: var(--sx-focus-ring);
+}
+.qb-map tr.qb-blocking td {
+  background: #fff5f5;
+}
+.qb-more {
+  padding: 6px 8px;
+}
+
+/* checks and problems */
+.qb-checks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+.qb-check {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid #cfe8d8;
+  background: #f4fbf6;
+}
+.qb-check > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.qb-check.qb-badcheck {
+  border-color: #f3c8a6;
+  background: #fff7ef;
+}
+.qb-checkmark {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #16a34a;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+}
+.qb-badcheck .qb-checkmark {
+  background: #ea580c;
+}
+.qb-problems {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  max-height: 260px;
+  overflow: auto;
+}
+.qb-problems li {
+  display: flex;
+  gap: 10px;
+  padding: 5px 10px;
+  border-bottom: 1px solid #f1f3f6;
+}
+.qb-problems li:last-child {
+  border-bottom: 0;
+}
+.qb-problems li.qb-perr {
+  background: #fff7f7;
+}
+.qb-where {
+  flex: 0 0 140px;
+  color: #64748b;
+  white-space: nowrap;
+}
+.qb-perr .qb-where {
+  color: var(--sx-danger);
+}
+
+@media (max-width: 760px) {
+  .qb-cards,
+  .qb-two,
+  .qb-checks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* bank rules step */
+.qb-rules {
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.qb-rules .rs-item {
+  border-bottom: 1px solid #f1f3f6;
+}
+.qb-rules .rs-item:last-child {
+  border-bottom: 0;
+}
+.qb-rules .rs-item.qb-rule-on {
+  background: #f5f9ff;
+}
+.qb-plain {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.6;
+}

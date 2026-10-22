@@ -1,0 +1,21 @@
+{
+  "name": "seriex-desktop",
+  "productName": "SerieX",
+  "version": "2026.10.3",
+  "description": "SerieX Books and SerieX Payroll as a desktop application",
+  "author": "SerieX",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "node scripts/build.mjs mac",
+    "build:win": "node scripts/build.mjs win",
+    "build:all": "node scripts/build.mjs all",
+    "publish": "node scripts/publish.mjs"
+  },
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3"
+  }
+}

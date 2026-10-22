@@ -1,0 +1,1270 @@
+/* Vendor module styles (prefix vx-). Colors come from the theme tokens. */
+
+/* ---------- edit dialog ---------- */
+.vx-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.vx-sec-narrow {
+  max-width: 420px;
+}
+.vx-fullname {
+  display: grid;
+  grid-template-columns: 84px 1fr 56px 1fr;
+  gap: 8px;
+}
+.vx-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+.vx-addrs {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: start;
+  margin-top: 4px;
+}
+.vx-addrcopy {
+  padding-top: 26px;
+}
+.vx-addr {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.vx-addr-row {
+  display: flex;
+  gap: 6px;
+}
+.vx-addr-row > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.vx-subhead {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sx-label);
+  margin-bottom: 4px;
+}
+.vx-hint {
+  margin: 0;
+  color: var(--sx-text-muted);
+  line-height: 1.45;
+}
+.vx-balnote {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 2px;
+}
+.vx-balnote strong {
+  font-size: 15px;
+}
+.vx-dlg-error {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* ---------- transaction forms ---------- */
+.vx-formhead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px 24px;
+  align-items: start;
+}
+.vx-formhead-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.vx-formhead-right {
+  display: grid;
+  grid-template-columns: 150px 150px;
+  gap: 10px 12px;
+  align-content: start;
+}
+.vx-formhead-right .vx-span2 {
+  grid-column: span 2;
+}
+.vx-readval {
+  height: var(--sx-control-h);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border: 1px dashed var(--sx-border-strong);
+  border-radius: var(--sx-radius);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--sx-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vx-readval.vx-right {
+  justify-content: flex-end;
+  font-variant-numeric: tabular-nums;
+}
+.vx-readval.vx-muted {
+  color: var(--sx-text-muted);
+}
+.vx-titletoggles {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.vx-memo-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.vx-memo-row .sx-hf {
+  flex: 1 1 260px;
+  max-width: 520px;
+}
+.vx-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--sx-accent-soft);
+  color: #1e3a8a;
+  border: 1px solid #c7d7fe;
+  font-size: 12.5px;
+}
+.vx-note.vx-warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.vx-note.vx-ok {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+.vx-note .sx-linkbtn {
+  margin-left: auto;
+}
+
+/* history panel rows */
+.vx-hist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.vx-hist-txn {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 6px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--sx-border);
+  font-size: 12px;
+  text-align: left;
+  background: none;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  cursor: pointer;
+  color: inherit;
+}
+.vx-hist-txn:hover .vx-hist-type {
+  color: var(--sx-accent);
+  text-decoration: underline;
+}
+.vx-hist-type {
+  font-weight: 500;
+}
+.vx-hist-date {
+  color: var(--sx-text-muted);
+  font-size: 11.5px;
+}
+.vx-hist-amt {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.vx-hist-notes {
+  white-space: pre-wrap;
+  color: var(--sx-text);
+  font-size: 12px;
+}
+
+/* ---------- check face (bill payments, sales tax payments) ---------- */
+.vx-check {
+  position: relative;
+  border: 1px solid #c9d6e6;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f7fbff 0%, #eef5fc 100%);
+  padding: 12px 16px 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px 150px;
+  gap: 10px 14px;
+  max-width: 920px;
+}
+.vx-check .vx-span2 {
+  grid-column: span 2;
+}
+.vx-check .vx-span3 {
+  grid-column: 1 / -1;
+}
+.vx-check-words {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  border-bottom: 1px solid #b8c7d9;
+  font-style: italic;
+  color: #1e3a5f;
+}
+.vx-check-words::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px dotted #9fb2c8;
+  margin-bottom: 4px;
+}
+.vx-check-dollar {
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.vx-acctbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.vx-endbal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 4px;
+}
+.vx-endbal strong {
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+}
+
+/* ---------- section card (inside forms and dialogs) ---------- */
+.vx-panel {
+  background: var(--sx-bg-panel);
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.vx-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--sx-border);
+  font-weight: 600;
+}
+.vx-panel-head .vx-spacer {
+  flex: 1;
+}
+.vx-panel-body {
+  padding: 10px 12px;
+}
+.vx-grid-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.vx-grid-wrap > .sx-grid {
+  flex: 1 1 auto;
+}
+
+/* small dialogs */
+.vx-dlg {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 360px;
+}
+.vx-dlg .sx-lv {
+  height: 220px;
+  border: 1px solid var(--sx-border);
+  border-radius: 6px;
+}
+.vx-dlg-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  font-size: 12.5px;
+}
+.vx-dlg-info dt {
+  color: var(--sx-text-muted);
+}
+.vx-dlg-info dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.vx-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.vx-strong {
+  font-weight: 600;
+}
+.vx-danger-text {
+  color: var(--sx-danger);
+}
+.vx-success-text {
+  color: var(--sx-success);
+}
+.vx-muted {
+  color: var(--sx-text-muted);
+}
+
+/* ---------- checkable table (selection dialogs) ---------- */
+.vx-ctable-wrap {
+  position: relative;
+  overflow: auto;
+  border: 1px solid var(--sx-border);
+  border-radius: 6px;
+  background: #fff;
+}
+.vx-ctable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.vx-ctable th {
+  position: sticky;
+  top: 0;
+  background: var(--sx-grid-header);
+  border-bottom: 1px solid var(--sx-border);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--sx-label);
+  padding: 6px 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+.vx-ctable td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--sx-grid-line);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+.vx-ctable tbody tr {
+  cursor: pointer;
+}
+.vx-ctable tbody tr:hover {
+  background: var(--sx-report-hover);
+}
+.vx-ctable tbody tr.vx-on {
+  background: #eef4ff;
+}
+.vx-ctable .vx-ctable-chk {
+  width: 30px;
+  text-align: center;
+}
+.vx-ctable-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--sx-text-muted);
+}
+
+/* ---------- purchase orders ---------- */
+.vx-po-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.vx-po-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items: flex-start;
+}
+.sx-grid-row.vx-row-done td,
+.vx-row-done .sx-grid-text {
+  color: var(--sx-text-muted);
+}
+
+/* ---------- pay bills ---------- */
+.vx-paybills {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px 12px;
+  background: var(--sx-form-bg);
+  min-height: 0;
+  overflow: auto;
+}
+.vx-pb-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+.vx-pb-cap {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sx-label);
+}
+.vx-pb-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--sx-border-strong);
+  margin: 0 4px;
+}
+.vx-pb-grid {
+  position: relative;
+  flex: 1 1 200px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+}
+.vx-pb-grid > .sx-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.vx-pb-grid > .sx-empty {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+}
+.sx-grid-row.vx-row-sel td {
+  background: #f1f6ff;
+}
+.vx-pb-totals {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vx-spacer {
+  flex: 1 1 auto;
+}
+.vx-pb-tot {
+  display: grid;
+  grid-template-columns: auto 100px 92px 104px 110px;
+  gap: 0;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.vx-pb-tot > span {
+  padding: 0 8px;
+}
+.vx-pb-tot > span:first-child {
+  font-weight: 600;
+  color: var(--sx-label);
+}
+.vx-pb-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: 10px;
+}
+.vx-pb-infobody {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.vx-pb-infobtns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: auto;
+}
+.vx-pb-paybody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: flex-start;
+}
+.vx-pb-check {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding-top: 2px;
+}
+.vx-pb-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--sx-border);
+}
+.vx-pb-banner {
+  margin: 0;
+}
+.vx-summary tbody tr {
+  cursor: pointer;
+}
+.vx-summary tfoot td {
+  border-top: 1px solid var(--sx-border-strong);
+  padding: 6px 8px;
+}
+
+/* ---------- bill payment / sales tax payment ---------- */
+.vx-chkform {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.vx-check-amtbox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 4px;
+}
+.vx-check-amtbox .vx-check-dollar {
+  min-width: 160px;
+  text-align: right;
+  padding: 3px 10px;
+  border: 1px solid #b8c7d9;
+  border-radius: 4px;
+  background: #fff;
+}
+.vx-bp-cap {
+  margin: 0 0 6px;
+}
+.sx-grid-row.vx-row-dim td {
+  color: var(--sx-text-muted);
+}
+.vx-bp-empty {
+  padding: 8px 2px;
+}
+
+/* ---------- vendor center ---------- */
+.vx-center {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--sx-bg-app);
+}
+/* the kit money bar is width:100%; with side margins that made the window scroll sideways */
+.sx-moneybar.vx-moneybar {
+  width: auto;
+  margin: 8px 12px 0;
+}
+/* the toolbar wraps in narrow windows: it must keep its height instead of overlapping the money bar */
+.vx-center > .sx-toolbar,
+.vx-center > .sx-moneybar {
+  flex: none;
+}
+.vx-center-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  padding: 8px 12px 12px;
+}
+.vx-center-body > .sx-splitter {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+/* narrow windows: the vendor list gives room to the details (its width is kept for wider windows) */
+.vx-center-body > .sx-splitter > .sx-pane:first-child {
+  max-width: 45%;
+}
+.vx-left,
+.vx-right {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--sx-bg-panel);
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.vx-lefttabs .sx-tabpanel {
+  display: none;
+}
+.vx-lefttabs .sx-tabstrip {
+  padding: 0 8px;
+}
+.vx-leftfilters {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--sx-border);
+}
+.vx-fill {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.vx-vendorlist {
+  border: 0;
+  border-radius: 0;
+}
+.vx-leftfoot {
+  padding: 6px 10px;
+  border-top: 1px solid var(--sx-border);
+  color: var(--sx-text-muted);
+  font-size: 12px;
+}
+.vx-bulkbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--sx-accent-soft);
+  border-bottom: 1px solid #c7d7fe;
+  font-size: 12px;
+}
+.vx-bulkbar > span {
+  font-weight: 600;
+  margin-right: auto;
+}
+.vx-rowchk {
+  margin: 0;
+  cursor: pointer;
+}
+.vx-rowact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 20px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--sx-text-muted);
+  cursor: pointer;
+  opacity: 0;
+}
+.sx-lv-row:hover .vx-rowact,
+.sx-lv-row.sx-sel .vx-rowact,
+.vx-rowact:focus-visible {
+  opacity: 1;
+}
+.vx-rowact:hover {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--sx-accent);
+}
+/* the 26 px actions column: no side padding, so the 24 px button is not cut */
+.vx-vendorlist .sx-lv-cell:has(> .vx-rowact) {
+  padding: 0 1px;
+}
+.vx-typelist {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 2px;
+  overflow: auto;
+}
+.vx-typeitem {
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--sx-text);
+  font: inherit;
+}
+.vx-typeitem:hover {
+  background: #f1f5f9;
+}
+.vx-typeitem.vx-on {
+  background: var(--sx-accent-soft);
+  color: var(--sx-accent);
+  font-weight: 600;
+}
+.vx-details {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* very short windows scroll instead of squeezing the transaction list to nothing */
+  overflow-y: auto;
+}
+.vx-details > .vx-infocard,
+.vx-details > .vx-typehead,
+.vx-details > .vx-filterbar {
+  flex: none;
+}
+.vx-infocard {
+  padding: 10px 14px 10px;
+  border-bottom: 1px solid var(--sx-border);
+}
+.vx-info-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.vx-info-name {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--sx-form-title);
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vx-ml {
+  margin-left: 6px;
+}
+.vx-info-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(150px, 0.8fr);
+  gap: 16px;
+}
+.vx-info-grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 10px;
+  margin: 0;
+  font-size: 12.5px;
+  align-content: start;
+}
+.vx-info-grid dt {
+  color: var(--sx-text-muted);
+  white-space: nowrap;
+}
+.vx-info-grid dd {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vx-pre {
+  white-space: pre-line;
+}
+.vx-info-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.vx-info-bal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.vx-info-bal strong {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.vx-info-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.vx-detail-tabs {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 6px 10px 10px;
+}
+.vx-detail-tabs > .sx-tabpanel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.vx-txnpane {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* a few rows always stay visible (the list never collapses to its header) */
+.vx-txnpane > .sx-lv,
+.vx-details > .sx-lv {
+  min-height: 150px;
+}
+.vx-txnpane > .vx-filterbar,
+.vx-txnpane > .vx-leftfoot {
+  flex: none;
+}
+/* The tabs keep room for the filters, at least the list's 150 px and its footer: in a short window
+   (or a narrow one, where the card is stacked and the filters wrap) the details pane scrolls down
+   to the transactions instead of squeezing them to nothing. (.sx-tabs.sx-fill sets min-height 0,
+   hence the longer selector.) */
+.vx-details > .sx-tabs.vx-detail-tabs {
+  min-height: 290px;
+}
+.vx-details.vx-narrow > .sx-tabs.vx-detail-tabs {
+  min-height: 330px;
+}
+
+/* compact vendor card (short windows, e.g. 1280x720): fewer lines, more transaction rows */
+.vx-compact .vx-infocard {
+  padding: 6px 12px 6px;
+}
+.vx-compact .vx-info-head {
+  margin-bottom: 4px;
+}
+.vx-compact .vx-info-name {
+  font-size: 15px;
+}
+.vx-compact .vx-info-body {
+  gap: 12px;
+}
+.vx-compact .vx-info-grid {
+  gap: 1px 8px;
+}
+.vx-compact .vx-info-grid dd {
+  white-space: nowrap;
+}
+.vx-compact .vx-info-grid dd.vx-pre {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.vx-compact .vx-info-side {
+  gap: 2px;
+}
+.vx-compact .vx-info-bal {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+}
+.vx-compact .vx-info-bal strong {
+  font-size: 15px;
+}
+.vx-compact .vx-info-links {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0 10px;
+}
+.vx-compact .vx-info-links > .sx-label {
+  display: none;
+}
+.vx-compact .vx-detail-tabs {
+  padding-top: 2px;
+}
+
+/* narrow windows: the card's columns are stacked */
+.vx-narrow .vx-info-body,
+.vx-narrow.vx-compact .vx-info-body {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+.vx-narrow .vx-info-contact {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.vx-narrow .vx-info-grid dd {
+  white-space: nowrap;
+}
+.vx-narrow .vx-info-bal {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+}
+.vx-narrow .vx-info-links {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0 10px;
+}
+.vx-narrow .vx-info-links > .sx-label {
+  display: none;
+}
+.vx-txnpane .sx-lv,
+.vx-details > .sx-lv {
+  border: 0;
+}
+.vx-filterbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--sx-border);
+}
+/* A caption and its control wrap to the next line together. */
+.vx-fpair {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  min-width: 0;
+}
+/* Filter drop-downs get no fixed width: a native select is as wide as its longest choice, so
+   "Purchase orders" or "This Fiscal Quarter-to-date" is never cut, whatever the font. The bar
+   wraps when the pane is narrow; a pane narrower than one drop-down never scrolls sideways. */
+.vx-filterbar .sx-select {
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+}
+.vx-typehead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 14px 4px;
+}
+.sx-lv-row.vx-lv-void .sx-lv-cell {
+  color: var(--sx-text-muted);
+  text-decoration: line-through;
+}
+.vx-contacts {
+  padding: 12px;
+  overflow: auto;
+}
+.vx-contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  max-width: 460px;
+}
+.vx-contact-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+.vx-contact-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  width: 100%;
+}
+.vx-contact-list > div {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 8px;
+}
+.vx-contact-list dt {
+  color: var(--sx-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vx-contact-list dd {
+  margin: 0;
+}
+.vx-todos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  overflow: auto;
+}
+.vx-todo-add {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.vx-todo-add > :first-child {
+  flex: 1 1 auto;
+}
+.vx-todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.vx-todo-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--sx-border);
+}
+.vx-todo-list li.vx-done .sx-check span {
+  text-decoration: line-through;
+  color: var(--sx-text-muted);
+}
+.vx-todo-date {
+  color: var(--sx-text-muted);
+  font-size: 12px;
+}
+.vx-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.vx-notes .sx-textarea {
+  flex: 1 1 auto;
+  min-height: 120px;
+  resize: none;
+}
+.vx-notes-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+.vx-notes-bar > span {
+  margin-right: auto;
+}
+
+/* ---------- Money Out ---------- */
+.vx-tracker-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 8px 12px 12px;
+  background: var(--sx-bg-panel);
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.vx-tracker-list {
+  border: 0;
+  border-radius: 0;
+  min-height: 150px;
+}
+.vx-tracker-body > .vx-filterbar,
+.vx-tracker-body > .vx-bulkbar,
+.vx-tracker-body > .vx-leftfoot {
+  flex: none;
+}
+.vx-tracker-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.vx-actcell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+.vx-actbtn {
+  height: 20px;
+  border: 1px solid var(--sx-border-strong);
+  background: #fff;
+  color: var(--sx-accent);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 8px;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer;
+}
+.vx-actbtn:hover {
+  background: var(--sx-accent-soft);
+}
+.vx-actbtn.vx-actmore {
+  border-left: 0;
+  border-radius: 0 4px 4px 0;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--sx-text-muted);
+}
+
+/* ---------- select item receipt ---------- */
+.vx-selrcpt {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  min-height: 0;
+}
+.vx-selrcpt-list {
+  border: 1px solid var(--sx-border);
+  border-radius: 6px;
+}
+.vx-selrcpt-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- inventory adjustment ---------- */
+.vx-adj-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---------- sales tax ---------- */
+.vx-salestax {
+  height: 100%;
+  overflow: auto;
+  padding: 14px 16px;
+  background: var(--sx-bg-app);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.vx-st-intro {
+  margin: 0;
+  color: var(--sx-text-muted);
+  line-height: 1.5;
+}
+.vx-st-grid {
+  display: grid;
+  /* at the default window size (780 wide) the list gets 428 px, enough for its three columns, and
+     the steps 306 px, enough for the preferences and the two buttons of each step */
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 1fr);
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.vx-st-items {
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+}
+.vx-st-items > .sx-card-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.vx-st-list {
+  flex: 1 1 auto;
+  min-height: 200px;
+  border: 0;
+}
+.vx-st-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.vx-st-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.vx-st-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sx-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+.vx-st-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.vx-st-links:first-child {
+  margin-top: 0;
+}
+.vx-salestax .vx-dlg-info {
+  margin: 0;
+  column-gap: 10px;
+}
+.vx-contents {
+  display: contents;
+}
+.vx-contents dt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.vx-m0 {
+  margin: 0;
+}
+.vx-paytax {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--sx-form-bg);
+  min-height: 0;
+  overflow: auto;
+}
+.vx-paytax-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: flex-start;
+}
+.vx-paytax-tot {
+  display: grid;
+  grid-template-columns: auto 110px 120px;
+  font-variant-numeric: tabular-nums;
+}
+.vx-paytax-tot > span {
+  padding: 0 8px;
+}
+.vx-paytax-tot > span:first-child {
+  font-weight: 600;
+  color: var(--sx-label);
+}
+
+.sx-txnform-footer > .vx-memo-row {
+  flex: 1 1 auto;
+}
+
+/* dialog content padding (showDialog boxes have none) */
+.vx-dlg {
+  padding: 14px 16px 0;
+}
+.vx-dlg > .sx-dlg-buttons {
+  margin: 4px -16px 0;
+}
+.vx-dlg .sx-fieldrow > .sx-field {
+  flex: 0 0 auto;
+}
+
+/* check face areas */
+.vx-check {
+  grid-template-areas:
+    'payee no date'
+    'words words words'
+    'addr amt amt'
+    'addr memo memo';
+  align-items: start;
+}
+.vx-check .vx-a-payee {
+  grid-area: payee;
+}
+.vx-check .vx-a-no {
+  grid-area: no;
+}
+.vx-check .vx-a-date {
+  grid-area: date;
+}
+.vx-check .vx-check-words {
+  grid-area: words;
+}
+.vx-check .vx-a-addr {
+  grid-area: addr;
+}
+.vx-check .vx-a-amt {
+  grid-area: amt;
+}
+.vx-check .vx-a-memo {
+  grid-area: memo;
+}
+
+/* pay bills summary: bills still owed after a partial payment */
+.vx-note.vx-owed ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* sales tax adjustment rows (no tax item) */
+.vx-taxadj {
+  font-style: italic;
+}
+.vx-dlg-info dt.vx-st-adj {
+  padding-left: 18px;
+}

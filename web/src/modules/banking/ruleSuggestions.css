@@ -1,0 +1,120 @@
+/* Suggested bank rules (ruleSuggestions.tsx), in Bank Rules and in the import wizard */
+
+.rs-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.rs-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.rs-when,
+.rs-muted,
+.rs-arrow {
+  color: #64748b;
+}
+.rs-text {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #eef2f7;
+}
+.rs-meta,
+.rs-why {
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.rs-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  color: #64748b;
+  font-size: 11.5px;
+}
+.rs-examples span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* list of suggestions with actions (Bank Rules) */
+.rs-panel {
+  flex: 0 1 auto;
+  max-height: 46%;
+  display: flex;
+  flex-direction: column;
+  margin: 10px 16px 0;
+  border: 1px solid #f6d48b;
+  border-radius: 8px;
+  background: #fffaf0;
+  min-height: 0;
+}
+.rs-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #f3e2b6;
+}
+.rs-panel-head b {
+  font-weight: 600;
+}
+.rs-panel-head .rs-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #6b5a2b;
+  font-size: 12px;
+}
+.rs-panel-body {
+  overflow: auto;
+  min-height: 0;
+}
+.rs-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #f3e2b6;
+}
+.rs-item:last-child {
+  border-bottom: 0;
+}
+.rs-item > .rs-summary {
+  flex: 1 1 auto;
+}
+.rs-actions {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+.rs-pick {
+  margin-top: 2px;
+}
+.rs-edit {
+  width: 220px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid var(--sx-field-border, #c5ccd6);
+  border-radius: 4px;
+  font: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+.rs-edit:focus {
+  outline: 0;
+  border-color: var(--sx-field-focus, #3b82f6);
+  box-shadow: var(--sx-focus-ring);
+}
+
+@media (max-width: 640px) {
+  .rs-item {
+    flex-direction: column;
+  }
+}

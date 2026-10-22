@@ -1,0 +1,1495 @@
+/* Customers module (Customer Center, sales forms, payments, statements, Money In).
+   Uses the kit tokens (--sxc-*) so it matches the rest of the app. Prefix: sx-cust-. */
+
+/* ------------------------------------------------------------------ sales forms */
+.sx-cust-addrrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 12px;
+}
+.sx-cust-addrrow .sx-address {
+  width: 100%;
+  resize: vertical;
+  min-height: 74px;
+  line-height: 1.35;
+}
+.sx-cust-fieldgrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: auto;
+}
+.sx-cust-fieldgrid .sx-hrow {
+  justify-content: flex-end;
+}
+.sx-cust-footleft {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sx-cust-totals {
+  min-width: 300px;
+}
+.sx-cust-totalscol {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-left: auto;
+}
+.sx-cust-billbanner {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-bottom: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #f5f3ff;
+  border: 1px solid #ddd6fe;
+  color: #4c1d95;
+  font-size: 12.5px;
+}
+.sx-cust-billbanner > span {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.sx-cust-taxwarn {
+  /* as wide as the totals above it (the text wraps instead of widening the column) */
+  width: 0;
+  min-width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.sx-cust-taxctl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sx-cust-taxrate {
+  color: var(--sxc-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  min-width: 52px;
+}
+.sx-cust-lines .sx-cust-subtotal-row .sx-grid-text {
+  font-weight: 600;
+}
+.sx-cust-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sx-cust-note {
+  color: var(--sxc-muted);
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ history panel */
+.sx-cust-hist-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.sx-cust-hist-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sx-cust-hist-txn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 6px;
+  row-gap: 1px;
+  padding: 3px 0;
+  border-bottom: 1px solid #eef1f4;
+  font-size: 12px;
+}
+.sx-cust-hist-txn:last-child {
+  border-bottom: 0;
+}
+.sx-cust-hist-txn .sx-linkbtn {
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.sx-cust-hist-amt {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.sx-cust-hist-pill,
+.sx-cust-hist-rel {
+  grid-column: 1 / -1;
+  justify-self: start;
+  font-size: 11px;
+}
+.sx-cust-hist-notes {
+  white-space: pre-wrap;
+  font-size: 12px;
+  max-height: 140px;
+  overflow: auto;
+}
+.sx-cust-hist-empty {
+  font-size: 12px;
+  padding: 2px 0;
+}
+.sx-cust-ellipsis {
+  display: inline-block;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+/* ------------------------------------------------------------------ dialogs */
+.sx-cust-dlg {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 380px;
+  padding: 14px 16px 12px;
+}
+.sx-cust-dlg p {
+  margin: 0;
+  line-height: 1.45;
+}
+.sx-cust-dlg-intro {
+  color: var(--sxc-muted);
+}
+.sx-cust-dlg-error {
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+.sx-cust-dlg-sum {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+}
+.sx-cust-dlg-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sx-cust-dlg-total {
+  margin-right: auto;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.sx-cust-pick-table {
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+  background: #fff;
+}
+.sx-cust-pick-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.sx-cust-pick-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--sxc-grid-head);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--sxc-muted);
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--sxc-border);
+  white-space: nowrap;
+}
+.sx-cust-pick-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #eef1f4;
+  white-space: nowrap;
+}
+.sx-cust-pick-table tr.sx-on td {
+  background: var(--sxc-sel-row);
+}
+.sx-cust-pick-table tbody tr:hover td {
+  background: var(--sxc-hover);
+}
+.sx-cust-pick-table tbody tr.sx-on:hover td {
+  background: var(--sxc-sel-row-focus);
+}
+.sx-cust-pick-table .sx-num,
+.sx-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.sx-cust-ck {
+  width: 30px;
+  text-align: center !important;
+}
+.sx-cust-amtcell .sx-input {
+  height: 24px;
+}
+.sx-cust-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 4px;
+}
+.sx-cust-choice-help {
+  margin: 0 0 8px 24px;
+  color: var(--sxc-muted);
+  font-size: 12px;
+}
+
+.sx-cust-hist-sub {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--sxc-muted);
+  font-size: 11px;
+}
+.sx-cust-hist-sub .sx-pill {
+  font-size: 11px;
+}
+.sx-cust-hist-lastpay {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+.sx-cust-hist-lastpay small {
+  color: var(--sxc-muted);
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------------ customer edit dialog */
+.sx-cust-edit-top {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sx-cust-edit-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sx-cust-addrpair {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sx-cust-copybtn {
+  align-self: center;
+  padding-top: 18px;
+}
+.sx-cust-addr {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sx-cust-addr-city {
+  display: flex;
+  gap: 5px;
+}
+.sx-cust-balance {
+  height: var(--sxc-h);
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.sx-cust-jobtoggle {
+  color: var(--sxc-muted);
+}
+.sx-cust-dlg-pad {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+.sx-cust-edit .sx-fieldrow {
+  gap: 10px 12px !important;
+}
+.sx-cust-4col > .sx-field {
+  flex: 1 1 110px;
+}
+.sx-cust-3col > .sx-field {
+  flex: 1 1 140px;
+}
+.sx-cust-addrpair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+.sx-cust-addr .sx-input {
+  height: 26px;
+}
+.sx-cust-edit-top {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------ customer center */
+.sx-cust-center {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--sxc-app);
+}
+.sx-cust-center > .sx-toolbar {
+  flex: 0 0 auto;
+}
+.sx-cust-moneybar {
+  flex: 0 0 auto;
+  padding: 8px 12px 10px;
+  background: #fff;
+  border-bottom: 1px solid var(--sxc-border);
+}
+.sx-cust-center > .sx-splitter {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.sx-cust-left {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid var(--sxc-border);
+  min-width: 0;
+}
+.sx-cust-left > .sx-tabs {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.sx-cust-leftbody {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.sx-cust-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 8px 6px;
+}
+.sx-cust-chipline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+  padding: 0 8px 6px;
+  font-size: 12px;
+}
+.sx-cust-filterchip,
+.sx-cust-bulk {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 2px 8px;
+  border-radius: 12px;
+  background: var(--sxc-accent-soft);
+  color: #1e3a8a;
+}
+.sx-cust-bulk .sx-btn {
+  height: 24px;
+}
+.sx-cust-listwrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sx-cust-listwrap > .sx-lv,
+.sx-cust-listwrap > .sx-empty {
+  flex: 1 1 auto;
+  min-height: 0;
+  border-left: 0;
+  border-right: 0;
+}
+.sx-cust-leftfoot {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border-top: 1px solid var(--sxc-border);
+  font-size: 12px;
+  color: var(--sxc-muted);
+}
+.sx-cust-rowcheck {
+  margin: 0;
+  vertical-align: middle;
+}
+.sx-cust-rowact {
+  visibility: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--sxc-accent);
+  cursor: pointer;
+}
+.sx-lv-row:hover .sx-cust-rowact,
+.sx-lv-row.sx-sel .sx-cust-rowact {
+  visibility: visible;
+}
+.sx-cust-rowact:hover {
+  background: var(--sxc-accent-soft);
+}
+.sx-cust-rowlink {
+  display: none;
+  border: 0;
+  background: transparent;
+  padding: 0 4px;
+  color: var(--sxc-accent);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sx-cust-rowlink:hover {
+  text-decoration: underline;
+}
+.sx-cust-statuscell {
+  display: inline-flex;
+  align-items: center;
+}
+.sx-lv-row:hover .sx-cust-statuscell.sx-has-action .sx-pill,
+.sx-lv-row.sx-sel .sx-cust-statuscell.sx-has-action .sx-pill {
+  display: none;
+}
+.sx-lv-row:hover .sx-cust-statuscell .sx-cust-rowlink,
+.sx-lv-row.sx-sel .sx-cust-statuscell .sx-cust-rowlink {
+  display: inline;
+}
+.sx-cust-empty-small {
+  padding: 16px;
+  color: var(--sxc-muted);
+}
+.sx-cust-typelist {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 1px;
+}
+.sx-cust-typeitem {
+  text-align: left;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font: inherit;
+  color: var(--sxc-text);
+  cursor: pointer;
+}
+.sx-cust-typeitem:hover {
+  background: var(--sxc-hover);
+}
+.sx-cust-typeitem.sx-on {
+  background: var(--sxc-accent-soft);
+  color: var(--sxc-accent);
+  font-weight: 600;
+}
+.sx-cust-right {
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sx-cust-right > .sx-empty {
+  flex: 1 1 auto;
+}
+.sx-cust-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+  padding: 8px 10px 10px;
+  /* very short windows: the pane scrolls instead of squeezing the transaction list away */
+  overflow-y: auto;
+}
+.sx-cust-infocard {
+  flex: 0 0 auto;
+  /* the card lays out its columns by its own width (narrow floating or tiled windows) */
+  container-type: inline-size;
+}
+.sx-cust-info-collapsed > .sx-card-body {
+  padding: 6px 14px;
+}
+.sx-cust-info-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 18px;
+  min-width: 0;
+  font-size: 12.5px;
+  line-height: 20px;
+}
+.sx-cust-info-line > * {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sx-cust-info-minibal {
+  margin-right: 6px;
+  font-size: 12.5px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+/* Info card header in a narrow window. The name keeps at least 60px (less only when the name
+   itself is shorter) and ends with an ellipsis, the whole name being its tooltip. When room runs
+   short the Inactive pill shrinks to its dot first; in a very narrow card the buttons move to a
+   second line instead of squeezing the name away. */
+.sx-cust-infocard > .sx-card-head {
+  flex-wrap: wrap;
+}
+.sx-cust-infocard > .sx-card-head > .sx-card-actions {
+  margin-left: auto;
+}
+.sx-cust-infocard .sx-card-titles {
+  /* the pill and the subtitle adapt to the room left next to the buttons */
+  container: sx-cust-info-titles / inline-size;
+  /* 60px name + 6px gap + 20px dot: below that the buttons wrap */
+  min-width: 86px;
+}
+.sx-cust-info-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+/* The name box shrinks down to min(name width, 60px): flex gives it that automatic minimum from
+   its content, which is two invisible zero-height copies of the name (data-name): one capped at
+   60px (the minimum) and one that may wrap anywhere (the full width when there is room). The
+   visible text adds nothing to the measuring (width 0) and fills the box. The box is a column
+   so the visible text can come first (order) and give the title its baseline. */
+.sx-cust-info-name {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-width: auto;
+  overflow: visible;
+}
+.sx-cust-info-name::before,
+.sx-cust-info-name::after {
+  content: attr(data-name);
+  order: 1;
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+.sx-cust-info-name::before {
+  max-width: 60px;
+  white-space: nowrap;
+}
+.sx-cust-info-name::after {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.sx-cust-info-name-text {
+  display: block;
+  width: 0;
+  min-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sx-cust-info-inactive {
+  flex: 0 0 auto;
+  display: inline-flex;
+}
+/* the name keeps the room first: the subtitle ("Job of ...", company name) only gets what is
+   left after it (flex basis 0), so it is cut before the name is */
+.sx-cust-infocard .sx-card-titles > .sx-card-title {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.sx-cust-infocard .sx-card-titles > .sx-card-sub {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* not enough room for the name and the full pill: the pill shows only its dot (a 20px circle;
+   the word stays for screen readers and the tooltip says it) */
+@container sx-cust-info-titles (width < 170px) {
+  .sx-cust-info-title {
+    gap: 6px;
+  }
+  .sx-cust-info-inactive > .sx-pill {
+    gap: 0;
+    padding: 0 7px;
+    font-size: 0;
+  }
+}
+/* very little room: the subtitle would get only a few letters, so its gap goes to the name */
+@container sx-cust-info-titles (width < 130px) {
+  .sx-cust-infocard .sx-card-titles > .sx-card-sub {
+    display: none;
+  }
+}
+.sx-cust-info {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) 190px;
+  grid-template-areas: 'contact address side';
+  gap: 4px 18px;
+}
+.sx-cust-info > :nth-child(1) {
+  grid-area: contact;
+}
+.sx-cust-info > :nth-child(2) {
+  grid-area: address;
+}
+.sx-cust-info > :nth-child(3) {
+  grid-area: side;
+}
+/* medium width: addresses under the contact details, the open balance box on the right */
+@container (max-width: 700px) {
+  .sx-cust-info {
+    grid-template-columns: minmax(0, 1fr) 170px;
+    grid-template-areas: 'contact side' 'address side';
+  }
+}
+/* the folded card's header in a medium window: the overdue part of the balance goes (it stays
+   in the tooltip) so the name keeps its room next to the buttons */
+@container (max-width: 600px) {
+  .sx-cust-info-minibal-due {
+    display: none;
+  }
+}
+/* narrow: one column, the open balance box last */
+@container (max-width: 480px) {
+  .sx-cust-info {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'contact' 'address' 'side';
+  }
+  .sx-cust-info-minibal {
+    display: none;
+  }
+}
+.sx-cust-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.sx-cust-info-row {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 8px;
+  line-height: 19px;
+  font-size: 12.5px;
+}
+.sx-cust-info-label {
+  color: var(--sxc-muted);
+  white-space: nowrap;
+}
+.sx-cust-info-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sx-cust-info-value .sx-cust-pre {
+  display: block;
+  white-space: pre-line;
+}
+.sx-cust-pre {
+  white-space: pre-line;
+}
+.sx-cust-iconline {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.sx-cust-info-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sx-cust-balbox {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid var(--sxc-border);
+  font-size: 12px;
+}
+.sx-cust-balbox b {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.sx-cust-reports {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid #f0f2f5;
+  font-size: 12px;
+}
+.sx-cust-reports-head {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sxc-muted);
+}
+.sx-cust-detailtabs {
+  flex: 1 1 auto;
+  min-height: 220px;
+}
+.sx-cust-txns {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.sx-cust-txnfilters {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 6px 8px;
+}
+.sx-cust-flabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--sxc-label);
+}
+.sx-cust-flabel .sx-select {
+  font-weight: 400;
+  letter-spacing: 0;
+  min-width: 130px;
+}
+.sx-cust-txncount {
+  margin-left: auto;
+  color: var(--sxc-muted);
+  font-size: 12px;
+}
+.sx-cust-txnlist {
+  flex: 1 1 auto;
+  min-height: 120px;
+}
+.sx-cust-voidrow .sx-lv-cell {
+  color: var(--sxc-faint);
+}
+.sx-cust-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+.sx-cust-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 460px;
+}
+.sx-cust-todoadd {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.sx-cust-todoadd > .sx-input {
+  flex: 1 1 auto;
+}
+.sx-cust-todos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sx-cust-todos li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 4px;
+  border-bottom: 1px solid #eef1f4;
+}
+.sx-cust-todos li.sx-done .sx-check span {
+  text-decoration: line-through;
+  color: var(--sxc-muted);
+}
+.sx-cust-tododate {
+  font-size: 12px;
+  color: var(--sxc-muted);
+}
+.sx-cust-notes .sx-textarea {
+  min-height: 180px;
+  width: 100%;
+}
+.sx-cust-typehead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sx-cust-typehead h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--sxc-title);
+}
+
+/* ------------------------------------------------------------------ receive payments */
+.sx-cust-readout {
+  height: var(--sxc-h);
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.sx-input.sx-cust-bigamount {
+  font-size: 15px;
+  font-weight: 600;
+}
+.sx-cust-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sx-cust-method {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--sxc-h);
+  padding: 0 10px;
+  border: 1px solid var(--sxc-border-strong);
+  border-radius: var(--sxc-r);
+  background: #fff;
+  font: inherit;
+  color: var(--sxc-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sx-cust-method:hover:not(:disabled) {
+  background: var(--sxc-hover);
+}
+.sx-cust-method.sx-on {
+  border-color: var(--sxc-accent);
+  background: var(--sxc-accent-soft);
+  color: var(--sxc-accent);
+  font-weight: 600;
+}
+.sx-cust-method:focus-visible {
+  outline: none;
+  box-shadow: var(--sxc-ring);
+}
+.sx-cust-method-caret {
+  font-size: 10px;
+  opacity: 0.7;
+}
+.sx-cust-paytable-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 6px;
+  /* the open invoice table adapts to the width of the form (DISC. DATE goes first) */
+  container-type: inline-size;
+}
+/* the open invoice table may shrink so the under/over-payment explanation stays visible at 1280x720 */
+.sx-txnform-lines:has(> .sx-cust-paytable-wrap) {
+  min-height: 140px;
+}
+.sx-cust-paytable-scroll {
+  flex: 1 1 auto;
+  min-height: 96px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+}
+/* fixed columns: NUMBER and JOB share what is left (ellipsis), PAYMENT always keeps its width */
+.sx-cust-paytable {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.sx-cust-paytable th,
+.sx-cust-paytable td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sx-cust-paytable th.sx-cust-ck {
+  width: 34px;
+}
+.sx-cust-paytable .sx-cust-ck {
+  padding: 0 4px;
+  text-overflow: clip;
+}
+.sx-cust-paytable .sx-cust-c-date {
+  width: 92px;
+}
+.sx-cust-paytable .sx-cust-c-amt {
+  width: 96px;
+}
+.sx-cust-paytable .sx-cust-c-ddate {
+  width: 92px;
+}
+.sx-cust-paytable .sx-cust-c-dc {
+  width: 120px;
+}
+@container (max-width: 860px) {
+  .sx-cust-paytable .sx-cust-c-ddate {
+    display: none;
+  }
+}
+.sx-cust-numcell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.sx-cust-numcell .sx-linkbtn {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sx-cust-numcell .sx-cust-overdue-dot {
+  flex: 0 0 auto;
+}
+.sx-cust-otherar {
+  padding: 0 2px;
+}
+.sx-cust-paytable th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 30px;
+  padding: 0 8px;
+  background: var(--sxc-grid-head);
+  border-bottom: 1px solid var(--sxc-border);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--sxc-muted);
+  text-align: left;
+  white-space: nowrap;
+}
+.sx-cust-paytable td {
+  height: 30px;
+  padding: 0 8px;
+  border-bottom: 1px solid #eef1f4;
+  white-space: nowrap;
+}
+.sx-cust-paytable tbody tr.sx-on td {
+  background: #f0fdf4;
+}
+.sx-cust-paytable tbody tr.sx-hi td {
+  background: var(--sxc-row-current, #fef9c3);
+}
+.sx-cust-paytable tbody tr:hover td {
+  background: var(--sxc-hover);
+}
+.sx-cust-paytable tfoot td {
+  height: 30px;
+  font-weight: 700;
+  border-top: 1px solid var(--sxc-border-strong);
+  background: #f8fafc;
+}
+.sx-cust-paytable .sx-cust-amtcell {
+  width: 126px;
+}
+.sx-cust-paytable .sx-cust-amtcell .sx-input {
+  height: 24px;
+}
+.sx-cust-tfoot-label {
+  text-align: right;
+  color: var(--sxc-muted);
+}
+.sx-cust-paytable-empty {
+  text-align: center;
+  color: var(--sxc-muted);
+  height: 60px !important;
+}
+.sx-cust-overdue-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--sxc-danger);
+  vertical-align: middle;
+}
+.sx-cust-jobcell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sx-cust-creditline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+}
+.sx-cust-explain {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid var(--sxc-border);
+  border-left: 3px solid var(--sxc-accent);
+  border-radius: 6px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.sx-cust-explain p {
+  margin: 0 0 2px;
+}
+.sx-cust-ok {
+  color: var(--sxc-success);
+  font-weight: 600;
+}
+.sx-cust-wrap {
+  flex-wrap: wrap;
+}
+.sx-cust-fieldgrid.sx-cust-fieldgrid-left {
+  margin-left: 0;
+}
+.sx-cust-fieldgrid.sx-cust-fieldgrid-left .sx-hrow {
+  justify-content: flex-start;
+}
+.sx-cust-creditinfo {
+  max-width: 360px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid var(--sxc-border);
+  font-size: 12px;
+  color: var(--sxc-text);
+}
+.sx-cust-bigreadout {
+  font-size: 16px;
+}
+.sx-cust-tobeprinted {
+  align-self: flex-end;
+  height: var(--sxc-h);
+  display: flex;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------------ statement charges */
+.sx-cust-stmt {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--sxc-form-bg);
+}
+.sx-cust-stmt-head {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 14px;
+  background: #fff;
+  border-bottom: 1px solid var(--sxc-border);
+}
+.sx-cust-stmt-spacer {
+  flex: 1 1 auto;
+}
+.sx-cust-stmt-bal {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--sxc-label);
+}
+.sx-cust-stmt-bal b {
+  margin-left: 6px;
+  font-size: 16px;
+  letter-spacing: 0;
+  color: var(--sxc-text);
+}
+.sx-cust-stmt-banner {
+  padding: 8px 14px 0;
+}
+.sx-cust-stmt > .sx-empty {
+  flex: 1 1 auto;
+}
+.sx-cust-stmt-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+}
+.sx-cust-stmt-scroll {
+  flex: 1 1 auto;
+  min-height: 120px;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+}
+.sx-cust-reg {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.sx-cust-reg thead th {
+  position: sticky;
+  z-index: 1;
+  background: var(--sxc-grid-head);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--sxc-muted);
+  text-align: left;
+  padding: 0 8px;
+  height: 22px;
+  white-space: nowrap;
+}
+.sx-cust-reg thead tr:first-child th {
+  top: 0;
+}
+.sx-cust-reg thead tr.sx-cust-reg-h2 th {
+  top: 22px;
+  border-bottom: 1px solid var(--sxc-border);
+  font-weight: 500;
+}
+.sx-cust-reg td {
+  padding: 0 8px;
+  height: 21px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12.5px;
+}
+.sx-cust-reg .sx-num {
+  text-align: right;
+}
+.sx-cust-reg-row {
+  cursor: default;
+}
+.sx-cust-reg-row tr.sx-cust-reg-l2 td {
+  color: var(--sxc-muted);
+  border-bottom: 1px solid #e9edf2;
+}
+.sx-cust-reg-row.sx-alt td {
+  background: #f5f8fc;
+}
+.sx-cust-reg-row:hover td {
+  background: var(--sxc-hover);
+}
+.sx-cust-reg-row.sx-sel td {
+  background: var(--sxc-row-selected, #fdf0b5);
+}
+.sx-cust-reg-row.sx-void td {
+  color: var(--sxc-faint);
+}
+.sx-cust-stmt-entry {
+  flex: 0 0 auto;
+  padding: 8px 10px 10px;
+  background: #fff;
+  border: 1px solid var(--sxc-border);
+  border-left: 3px solid var(--sxc-accent);
+  border-radius: 6px;
+}
+.sx-cust-stmt-entry.sx-editing {
+  border-left-color: var(--sxc-warning);
+  background: #fffdf4;
+}
+.sx-cust-stmt-entryhead {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.sx-cust-stmt-grid {
+  display: grid;
+  grid-template-columns: 136px 100px minmax(180px, 2fr) 80px 100px 130px;
+  gap: 6px 8px;
+}
+.sx-cust-stmt-grid > .sx-cust-stmt-desc {
+  grid-column: 2 / 6;
+}
+.sx-cust-stmt-grid > .sx-cust-stmt-class {
+  grid-column: 1 / 2;
+}
+.sx-cust-stmt-grid > .sx-cust-stmt-due {
+  grid-column: 6 / 7;
+}
+.sx-cust-stmt-grid > label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--sxc-label);
+  min-width: 0;
+}
+.sx-cust-stmt-grid > label > * {
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.sx-cust-stmt-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sx-cust-stmt-foot {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ create statements */
+.sx-cust-cs {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  background: var(--sxc-app);
+}
+.sx-cust-cs-left {
+  flex: 0 0 330px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px;
+  overflow: auto;
+  background: #fff;
+  border-right: 1px solid var(--sxc-border);
+}
+.sx-cust-cs-left section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sx-cust-cs-left h3 {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sxc-label);
+}
+.sx-cust-cs-indent {
+  margin-left: 24px;
+}
+.sx-cust-cs-multi {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sx-cust-cs-checklist {
+  max-height: 180px;
+  overflow: auto;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sx-cust-cs-checklist .sx-check {
+  width: 100%;
+}
+.sx-cust-cs-cust {
+  display: inline-flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 220px;
+}
+.sx-cust-cs-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
+}
+.sx-cust-cs-right {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.sx-cust-cs-right > .sx-empty {
+  flex: 1 1 auto;
+}
+.sx-cust-cs-summary {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  background: #fff;
+  border-bottom: 1px solid var(--sxc-border);
+}
+.sx-cust-cs-frame {
+  flex: 1 1 auto;
+  border: 0;
+  width: 100%;
+  background: #e5e9ef;
+}
+
+/* ------------------------------------------------------------------ Money In */
+.sx-cust-it {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--sxc-app);
+}
+.sx-cust-it-top {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px 10px;
+  background: #fff;
+  border-bottom: 1px solid var(--sxc-border);
+}
+.sx-cust-it-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sxc-title);
+}
+.sx-cust-it-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 10px 8px;
+}
+.sx-cust-it-bulk {
+  padding: 0 8px 6px;
+}
+.sx-cust-it-foot {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+}
+/* Money In STATUS: a status longer than the column ("Partially applied") ends with an
+   ellipsis instead of being cut off (the list shows the whole text on hover) */
+.sx-cust-it .sx-lv-cell > .sx-pill {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 20px;
+}
+.sx-cust-it .sx-lv-cell > .sx-pill > .sx-badge-dot {
+  margin-right: 5px;
+  vertical-align: 1px;
+}
+.sx-cust-actcell {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.sx-cust-actmain {
+  border: 0;
+  background: transparent;
+  padding: 0 4px;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--sxc-accent);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sx-cust-actmain:hover {
+  text-decoration: underline;
+}
+.sx-cust-actmore {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--sxc-muted);
+  cursor: pointer;
+}
+.sx-cust-actmore:hover {
+  background: var(--sxc-hover);
+  color: var(--sxc-text);
+}
+.sx-cust-dlg > .sx-dlg-buttons {
+  margin: 4px -16px -12px;
+}
+.sx-cust-moneybar .sx-mb-seg,
+.sx-cust-it-top .sx-mb-seg {
+  min-width: 128px;
+}
+/* narrow windows: a money bar group moves to the next line instead of overlapping its neighbour */
+.sx-cust-moneybar .sx-moneybar,
+.sx-cust-it-top .sx-moneybar {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.sx-cust-moneybar .sx-mb-group,
+.sx-cust-it-top .sx-mb-group {
+  min-width: min-content;
+}
+.sx-cust-moneybar .sx-mb-caption,
+.sx-cust-it-top .sx-mb-caption {
+  contain: inline-size;
+  overflow: hidden;
+}
+.sx-cust-moneybar .sx-mb-note,
+.sx-cust-it-top .sx-mb-note {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sx-cust-pick-table td.sx-cust-wrapcell {
+  white-space: normal;
+  min-width: 120px;
+  line-height: 1.3;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.sx-cust-namelist .sx-lv-row > .sx-lv-cell:first-child,
+.sx-cust-it .sx-lv-row > .sx-lv-cell:first-child {
+  padding-left: 6px;
+  padding-right: 0;
+  text-overflow: clip;
+}

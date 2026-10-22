@@ -1,0 +1,26 @@
+# Dependencies and build output
+node_modules/
+dist/
+desktop/build/
+.vite/
+*.tsbuildinfo
+
+# Company files and runtime data (customer books and payroll data are never committed)
+server/data/
+payroll/server/data/
+*.sxb
+*.sxb-wal
+*.sxb-shm
+*.sxp
+*.sxp-wal
+*.sxp-shm
+
+# Compiled server binaries
+/server/seriex
+/server/server
+/payroll/server/seriexpayroll
+/payroll/server/server
+
+# Logs and OS files
+*.log
+.DS_Store

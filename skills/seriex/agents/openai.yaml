@@ -1,0 +1,9 @@
+interface:
+  display_name: "SerieX"
+  short_description: "Do your bookkeeping and payroll in SerieX Books and SerieX Payroll"
+  icon_small: "./assets/icon-small.svg"
+  icon_large: "./assets/icon-large.svg"
+  brand_color: "#2563EB"
+  default_prompt: "Use $seriex to help me with my books in SerieX."
+policy:
+  allow_implicit_invocation: true

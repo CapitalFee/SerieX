@@ -1,0 +1,1105 @@
+/* Employees module (Employee Center, Payroll Center, employee window, payroll items, pay
+   schedules, employee defaults). Uses the kit tokens (--sxc-*, --sx-*) so it matches the rest of
+   SerieX Payroll and the current SerieX Books screens. Prefix: sxp-emp-. */
+
+/* ------------------------------------------------------------------ list pages */
+.sxp-emp-page {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--sx-bg-app);
+  font-family: var(--sx-font);
+  font-size: var(--sx-font-size);
+  color: var(--sx-text);
+}
+.sxp-emp-head {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+.sxp-emp-head .sx-search {
+  width: 220px;
+  flex: 0 1 220px;
+}
+.sxp-emp-head-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+.sxp-emp-list.sx-lv {
+  flex: 1 1 auto;
+  min-height: 120px;
+}
+.sxp-emp-foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sxp-emp-count {
+  margin-left: auto;
+  color: var(--sx-text-muted, var(--sxc-muted));
+  font-size: 12px;
+  white-space: nowrap;
+}
+.sxp-emp-emptywrap {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  background: #fff;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+}
+.sxp-emp-money {
+  font-variant-numeric: tabular-nums;
+}
+.sxp-emp-neg {
+  color: var(--sxc-danger);
+}
+.sxp-emp-dim {
+  color: var(--sxc-muted);
+}
+.sxp-emp-notice {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid var(--sxc-border);
+  color: #475569;
+  font-size: 12.5px;
+}
+.sxp-emp-notice svg {
+  flex: 0 0 auto;
+  color: var(--sxc-accent);
+}
+.sxp-emp-notice.sxp-warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.sxp-emp-notice.sxp-warn svg {
+  color: #d97706;
+}
+.sxp-emp-rowact {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 2px;
+  width: 100%;
+  visibility: hidden;
+}
+.sx-lv-row:hover .sxp-emp-rowact,
+.sx-lv-row.sx-sel .sxp-emp-rowact {
+  visibility: visible;
+}
+.sxp-emp-rowact button {
+  height: 22px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--sxc-accent);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sxp-emp-rowact button:hover {
+  background: rgba(37, 99, 235, 0.1);
+}
+
+/* ------------------------------------------------------------------ center */
+.sxp-emp-center {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--sxc-app);
+}
+.sxp-emp-center > .sx-toolbar {
+  flex: 0 0 auto;
+}
+.sxp-emp-center > .sx-splitter {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.sxp-emp-left {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid var(--sxc-border);
+  min-width: 0;
+}
+.sxp-emp-left > .sx-tabs {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.sxp-emp-leftbody {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.sxp-emp-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 8px 6px;
+}
+.sxp-emp-listwrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sxp-emp-listwrap > .sx-lv,
+.sxp-emp-listwrap > .sx-empty {
+  flex: 1 1 auto;
+  min-height: 0;
+  border-left: 0;
+  border-right: 0;
+}
+.sxp-emp-leftfoot {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border-top: 1px solid var(--sxc-border);
+  font-size: 12px;
+  color: var(--sxc-muted);
+}
+.sxp-emp-rowicon {
+  visibility: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 22px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--sxc-accent);
+  cursor: pointer;
+}
+.sx-lv-row:hover .sxp-emp-rowicon,
+.sx-lv-row.sx-sel .sxp-emp-rowicon {
+  visibility: visible;
+}
+.sxp-emp-rowicon:hover {
+  background: var(--sxc-accent-soft);
+}
+.sxp-emp-namecell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+.sxp-emp-namecell > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* the employee's SerieX Books name could not be created / updated (booksSyncError) */
+.sxp-emp-syncwarn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: #d97706;
+}
+.sxp-emp-tag {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  height: 17px;
+  padding: 0 6px;
+  border-radius: 9px;
+  background: #eef1f5;
+  color: #5b6573;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-style: normal;
+}
+.sxp-emp-typelist {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  gap: 1px;
+}
+.sxp-emp-typeitem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  font: inherit;
+  color: var(--sxc-text);
+  cursor: pointer;
+}
+.sxp-emp-typeitem:hover {
+  background: var(--sxc-hover);
+}
+.sxp-emp-typeitem.sxp-on {
+  background: var(--sxc-accent-soft);
+  color: var(--sxc-accent);
+  font-weight: 600;
+}
+.sxp-emp-right {
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sxp-emp-right > .sx-empty {
+  flex: 1 1 auto;
+}
+.sxp-emp-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+  padding: 8px 10px 10px;
+  overflow: auto;
+  container-type: inline-size;
+}
+.sxp-emp-infocard {
+  flex: 0 0 auto;
+}
+.sxp-emp-info-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.sxp-emp-info {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) 200px;
+  gap: 4px 18px;
+}
+.sxp-emp-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.sxp-emp-info-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 8px;
+  line-height: 19px;
+  font-size: 12.5px;
+}
+.sxp-emp-info-label {
+  color: var(--sxc-muted);
+  white-space: nowrap;
+}
+.sxp-emp-info-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sxp-emp-pre {
+  display: block;
+  white-space: pre-line;
+}
+.sxp-emp-iconline {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.sxp-emp-info-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* narrow right pane: two columns of fields, the pay and time off boxes side by side below */
+@container (max-width: 780px) {
+  .sxp-emp-info {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .sxp-emp-info-side {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    margin-top: 6px;
+  }
+  .sxp-emp-info-side > .sxp-emp-balbox {
+    flex: 1 1 0;
+  }
+}
+@container (max-width: 520px) {
+  .sxp-emp-info {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sxp-emp-info-side {
+    flex-direction: column;
+  }
+}
+.sxp-emp-balbox {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid var(--sxc-border);
+  font-size: 12px;
+}
+.sxp-emp-balbox b {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.sxp-emp-ptoline {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.sxp-emp-reports {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid #f0f2f5;
+  font-size: 12px;
+}
+.sxp-emp-caps {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sxc-muted);
+}
+.sxp-emp-detailtabs {
+  flex: 1 1 auto;
+  min-height: 220px;
+}
+.sxp-emp-txns {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.sxp-emp-txnfilters {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 6px 8px;
+}
+.sxp-emp-flabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--sxc-label);
+}
+.sxp-emp-flabel .sx-select {
+  font-weight: 400;
+  letter-spacing: 0;
+  min-width: 130px;
+}
+.sxp-emp-range {
+  color: var(--sxc-muted);
+  font-size: 12px;
+}
+.sxp-emp-txncount {
+  margin-left: auto;
+  color: var(--sxc-muted);
+  font-size: 12px;
+}
+.sxp-emp-txnlist {
+  flex: 1 1 auto;
+  min-height: 120px;
+}
+.sxp-emp-voidrow .sx-lv-cell {
+  color: var(--sxc-faint);
+}
+.sxp-emp-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+.sxp-emp-notes .sx-textarea {
+  min-height: 160px;
+  width: 100%;
+}
+.sxp-emp-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sxp-emp-note {
+  color: var(--sxc-muted);
+  font-size: 12px;
+}
+.sxp-emp-typehead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sxp-emp-typehead h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--sxc-title);
+}
+.sxp-emp-empty-small {
+  padding: 16px;
+  color: var(--sxc-muted);
+}
+
+/* ------------------------------------------------------------------ payroll center */
+.sxp-pc-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  overflow: auto;
+  min-height: 0;
+}
+.sxp-pc-status {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+  background: #f8fafc;
+  font-size: 12px;
+}
+.sxp-pc-statusline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 12.5px;
+}
+.sxp-pc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sxc-success);
+  flex: 0 0 auto;
+}
+.sxp-pc-dot.sxp-bad {
+  background: var(--sxc-danger);
+}
+.sxp-pc-dot.sxp-warn {
+  background: var(--sxc-warning);
+}
+.sxp-pc-cal .sx-calendar {
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+  box-shadow: none;
+  width: 100%;
+}
+.sxp-pc-links {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+}
+.sxp-pc-links .sx-linkbtn {
+  text-align: left;
+}
+.sxp-pc {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 8px 10px 10px;
+  gap: 8px;
+}
+.sxp-pc > .sx-tabs {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.sxp-pc-tablabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sxp-pc-alert {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--sxc-warning);
+}
+.sxp-pc-alert.sxp-bad {
+  background: var(--sxc-danger);
+}
+.sxp-pc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+  padding: 10px 12px 12px;
+  overflow: auto;
+}
+.sxp-pc-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+/* the main list takes the free height; on a short window the tab body scrolls instead of
+   squeezing the sections over each other */
+.sxp-pc-section.sxp-grow {
+  flex: 1 0 auto;
+  min-height: 220px;
+}
+.sxp-pc-sechead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sxp-pc-sechead h3 {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--sxc-title);
+}
+.sxp-pc-sechead .sxp-emp-note {
+  margin-left: auto;
+}
+.sxp-pc-list {
+  min-height: 130px;
+  flex: 1 1 auto;
+}
+.sxp-pc-list.sxp-short {
+  min-height: 110px;
+  max-height: 180px;
+  flex: 0 0 auto;
+  height: 150px;
+}
+.sxp-pc-buttons {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sxp-pc-buttons .sxp-emp-note {
+  margin-left: auto;
+}
+.sxp-pc-total {
+  margin-left: auto;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.sxp-pc-activities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 6px 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+  background: #fafbfc;
+}
+.sxp-pc-actcol {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+}
+.sxp-pc-actcol .sx-linkbtn {
+  text-align: left;
+}
+.sxp-pc-check {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--sxc-accent);
+  vertical-align: middle;
+}
+.sxp-pc-activities,
+.sxp-pc-booksline {
+  flex: 0 0 auto;
+}
+.sxp-pc-booksline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--sxc-muted);
+}
+
+/* ------------------------------------------------------------------ employee window */
+.sxp-emp-edit .sx-fieldrow {
+  gap: 10px 12px !important;
+}
+.sxp-emp-edit-top {
+  flex: 1 1 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sxp-emp-for {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sxc-label);
+}
+.sxp-emp-for b {
+  color: var(--sxc-accent);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12.5px;
+}
+.sxp-emp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.sxp-emp-grid {
+  display: grid;
+  gap: 12px 14px;
+  align-items: start;
+  min-width: 0;
+}
+.sxp-emp-g2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sxp-emp-g3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.sxp-emp-g4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.sxp-emp-span2 {
+  grid-column: span 2;
+}
+.sxp-emp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  padding: 10px 12px 12px;
+  background: #fff;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+}
+.sxp-emp-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sxc-label);
+}
+.sxp-emp-section-title .sxp-emp-note {
+  margin-left: 6px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+.sxp-emp-ssn {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.sxp-emp-ssn > .sx-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.sxp-emp-payhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 10px 12px;
+}
+.sxp-emp-payhead > .sx-field {
+  flex: 1 1 170px;
+}
+.sxp-emp-paybtns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sxp-emp-grids {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+}
+.sxp-emp-gridbox {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.sxp-emp-gridbox > .sx-grid {
+  height: 158px;
+}
+.sxp-emp-taxsum {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid var(--sxc-border);
+  font-size: 12px;
+  color: #475569;
+}
+.sxp-emp-taxsum b {
+  color: var(--sxc-text);
+  font-weight: 600;
+}
+.sxp-emp-taxsum .sxp-emp-err {
+  color: var(--sxc-danger);
+}
+.sxp-emp-readout {
+  display: flex;
+  align-items: center;
+  height: var(--sxc-h);
+  padding: 0 9px;
+  background: #f6f7f9;
+  border: 1px solid var(--sxc-border);
+  border-radius: var(--sxc-r);
+  color: #374151;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* small dialogs (Taxes, Sick and Vacation, Direct Deposit) */
+.sxp-emp-dlg {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.sxp-emp-dlg-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  max-height: min(70vh, 620px);
+  overflow: auto;
+}
+.sxp-emp-dlg-body.sxp-emp-dlg-fixed {
+  height: min(68vh, 540px);
+}
+.sxp-emp-dlg > .sx-dlg-buttons {
+  margin: 0;
+  padding: 10px 16px;
+  background: #f8fafc;
+  border-top: 1px solid var(--sxc-border);
+  justify-content: flex-end;
+}
+.sxp-emp-dlg-buttons-left {
+  margin-right: auto;
+}
+.sxp-emp-dlg .sx-tabs-folder > .sx-tabpanel {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sxp-emp-dlg .sx-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.sxp-emp-dlg .sx-group > legend {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sxc-label);
+}
+.sxp-emp-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+.sxp-emp-dlg-error {
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+.sxp-emp-hint {
+  color: var(--sxc-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.sxp-emp-othergrid > .sx-grid {
+  height: 170px;
+}
+.sxp-emp-perhours {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ wizard (payroll item) */
+.sxp-wiz {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: #fff;
+}
+.sxp-wiz-rail {
+  flex: 0 0 188px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 10px;
+  background: #f8fafc;
+  border-right: 1px solid var(--sxc-border);
+  overflow: auto;
+}
+.sxp-wiz-railtitle {
+  padding: 0 8px 10px;
+  font-weight: 600;
+}
+.sxp-wiz-railfoot {
+  margin-top: auto;
+  padding: 8px 8px 0;
+  line-height: 1.45;
+  color: var(--sxc-muted);
+  font-size: 12px;
+}
+.sxp-wiz-step {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font: inherit;
+  color: #475569;
+  text-align: left;
+  cursor: pointer;
+}
+.sxp-wiz-step:hover:not(:disabled) {
+  background: #eef2f6;
+}
+.sxp-wiz-step:disabled {
+  cursor: default;
+  color: #94a3b8;
+}
+.sxp-wiz-step.sxp-on {
+  background: #fff;
+  color: var(--sxc-accent);
+  font-weight: 600;
+  box-shadow: var(--sxc-shadow-sm);
+}
+.sxp-wiz-num {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e5e9ef;
+  color: #475569;
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.sxp-wiz-step.sxp-on .sxp-wiz-num {
+  background: var(--sxc-accent);
+  color: #fff;
+}
+.sxp-wiz-step.sxp-done .sxp-wiz-num {
+  background: #dcfce7;
+  color: #15803d;
+}
+.sxp-wiz-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sxp-wiz-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sxp-wiz-head h2 {
+  margin: 0 0 3px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--sxc-title);
+}
+.sxp-wiz-head .sxp-emp-note {
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.sxp-wiz-foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f8fafc;
+  border-top: 1px solid var(--sxc-border);
+}
+.sxp-wiz-foot .sxp-grow {
+  flex: 1 1 auto;
+  color: var(--sxc-muted);
+  font-size: 12px;
+}
+.sxp-wiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sxp-wiz-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 10px;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+.sxp-wiz-opt:hover {
+  background: #f8fafc;
+}
+.sxp-wiz-opt.sxp-on {
+  border-color: rgba(37, 99, 235, 0.45);
+  background: var(--sxc-accent-soft);
+}
+.sxp-wiz-opt input {
+  margin-top: 2px;
+}
+.sxp-wiz-opt b {
+  display: block;
+  font-weight: 600;
+}
+.sxp-wiz-opt span.sxp-emp-note {
+  display: block;
+}
+.sxp-wiz-taxes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+}
+.sxp-wiz-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #f8fafc;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+  color: #475569;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.sxp-wiz-info svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--sxc-accent);
+}
+.sxp-wiz-info.sxp-warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.sxp-wiz-info.sxp-warn svg {
+  color: #d97706;
+}
+.sxp-wiz-summary {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 4px 12px;
+  font-size: 12.5px;
+}
+.sxp-wiz-summary > span:nth-child(odd) {
+  color: var(--sxc-muted);
+}
+
+/* ------------------------------------------------------------------ pay schedule dialog */
+.sxp-ps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sxp-ps-intro {
+  color: #475569;
+  line-height: 1.5;
+  font-size: 12.5px;
+}
+.sxp-ps-q {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 8px 14px;
+  align-items: center;
+}
+.sxp-ps-q > label {
+  line-height: 1.35;
+}
+.sxp-ps-ctl {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.sxp-ps-summary {
+  padding: 9px 12px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid var(--sxc-border);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #475569;
+}
+.sxp-ps-summary b {
+  color: var(--sxc-text);
+}
+
+/* ------------------------------------------------------------------ employee defaults */
+.sxp-def {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

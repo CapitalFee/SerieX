@@ -1,0 +1,124 @@
+/* App switcher (top bar "apps" button and its panel). */
+.sx-apps-btn {
+  margin-left: 2px;
+}
+
+.sx-apps-panel {
+  width: 400px;
+  padding-bottom: 4px;
+}
+
+.sx-apps-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--sx-radius, 4px);
+  background: transparent;
+  color: var(--sx-text, #1f2937);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sx-apps-item:hover,
+.sx-apps-item:focus-visible {
+  background: var(--sx-accent-soft, #eff6ff);
+  outline: none;
+}
+
+.sx-apps-item:focus-visible {
+  box-shadow: var(--sx-focus-ring, 0 0 0 2px rgba(37, 99, 235, 0.35));
+}
+
+.sx-apps-current {
+  cursor: default;
+}
+
+.sx-apps-tile {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+}
+
+.sx-apps-books {
+  background: #e8f0fe;
+  color: var(--sx-accent, #2563eb);
+}
+
+.sx-apps-payroll {
+  background: #e6f4ef;
+  color: #059669;
+}
+
+.sx-apps-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sx-apps-text b {
+  font-weight: 600;
+}
+
+.sx-apps-text span {
+  color: var(--sx-text-muted, #6b7280);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sx-apps-state {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--sx-success, #16a34a);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sx-apps-off .sx-apps-tile {
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.sx-apps-off .sx-apps-text b {
+  color: var(--sx-text-muted, #6b7280);
+}
+
+.sx-apps-off {
+  cursor: default;
+}
+
+.sx-apps-retry {
+  color: var(--sx-accent, #2563eb);
+  cursor: pointer;
+}
+
+.sx-apps-spin {
+  animation: sx-apps-spin 0.9s linear infinite;
+}
+
+@keyframes sx-apps-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sx-apps-foot {
+  margin-top: 4px;
+  padding: 6px 12px 2px;
+  border-top: 1px solid var(--sx-border, #e3e6ea);
+  color: var(--sx-text-muted, #6b7280);
+  font-size: 11px;
+}

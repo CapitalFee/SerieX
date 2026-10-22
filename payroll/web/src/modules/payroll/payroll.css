@@ -1,0 +1,950 @@
+/* Payroll screens: Pay Employees, Paycheck Details, Paycheck, Find and Edit Paychecks,
+   Print Paychecks / Pay Stubs, Enter Year-to-Date Amounts. Class prefix: py-. Same tokens and
+   proportions as the SerieX Books screens (Pay Bills, Write Checks, Print Checks, wizards). */
+
+/* ------------------------------------------------------------ page frame */
+.py-page {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px 0;
+  background: var(--sx-form-bg);
+  overflow: auto;
+}
+.py-grow {
+  flex: 1 1 auto;
+}
+.py-muted {
+  color: var(--sx-text-muted);
+}
+.py-small {
+  font-size: 12px;
+}
+.py-strong {
+  font-weight: 600;
+}
+.py-neg {
+  color: var(--sx-danger);
+}
+.py-r {
+  text-align: right;
+}
+.py-num {
+  font-variant-numeric: tabular-nums;
+}
+.py-ro {
+  display: inline-block;
+  min-width: 110px;
+  height: 28px;
+  line-height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--sx-border);
+  border-radius: var(--sx-radius);
+  background: #f8fafc;
+  font-variant-numeric: tabular-nums;
+}
+.py-banner {
+  margin: 0;
+}
+.py-foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: auto -14px 0;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-top: 1px solid var(--sx-border);
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+}
+.py-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.py-gridwrap {
+  position: relative;
+  flex: 1 1 220px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+}
+.py-gridwrap > .sx-grid,
+.py-gridwrap > .sx-lv,
+.py-gridwrap > .py-ct {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.py-gridwrap > .sx-empty {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+}
+.py-panel {
+  background: var(--sx-bg-panel);
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+.py-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--sx-border);
+  font-weight: 600;
+}
+.py-panel-body {
+  padding: 10px 12px;
+}
+.py-panel > .sx-grid {
+  border: 0;
+  border-radius: 0 0 8px 8px;
+}
+.py-warnings {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 7px 10px;
+  border: 1px solid #fde68a;
+  border-radius: var(--sx-radius);
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 12.5px;
+}
+.py-warnings svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+.py-warnings ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+/* ------------------------------------------------------------ step header (Pay Employees) */
+.py-steps {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.py-steps li {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  background: #eef2f6;
+  color: #64748b;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.py-steps li.py-on {
+  background: #fff;
+  color: var(--sx-accent);
+  font-weight: 600;
+  box-shadow: var(--sx-shadow-sm);
+}
+.py-steps li.py-past {
+  color: #15803d;
+}
+.py-stepnum {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #dbe2ea;
+  color: #475569;
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+.py-steps li.py-on .py-stepnum {
+  background: var(--sx-accent);
+  color: #fff;
+}
+.py-steps li.py-past .py-stepnum {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* ------------------------------------------------------------ payroll information */
+.py-info,
+.py-options {
+  background: var(--sx-bg-panel);
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  padding: 8px 14px 10px;
+}
+.py-info-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sx-label);
+  margin-bottom: 6px;
+}
+.py-info-cols {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.py-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.py-info-col:first-child {
+  flex: 1 1 220px;
+}
+.py-info-strong {
+  font-weight: 600;
+  font-size: 14px;
+}
+.py-info-dates {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  align-items: center;
+  gap: 6px 10px;
+}
+.py-info-bank {
+  gap: 4px;
+}
+.py-options-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+/* ------------------------------------------------------------ Hours and Pay grid */
+.py-enter .sx-grid-cell:has(.py-na-cell) {
+  background: repeating-linear-gradient(135deg, #f1f5f9 0 6px, #e9eef4 6px 12px);
+}
+.py-na-cell {
+  display: block;
+  height: 100%;
+}
+.sx-grid-row.py-row-edited td,
+.py-table tr.py-row-edited td {
+  background: #fffbe6;
+}
+.sx-grid-row.py-row-off td {
+  color: var(--sx-text-muted);
+}
+.py-emplink {
+  font-weight: 500;
+  text-align: left;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ simple tables */
+.py-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+}
+.py-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 30px;
+  padding: 0 10px;
+  background: var(--sxc-grid-head);
+  border-bottom: 1px solid var(--sx-border);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--sxc-muted);
+  text-align: left;
+  white-space: nowrap;
+}
+.py-table th.py-r {
+  text-align: right;
+}
+.py-table td {
+  height: 30px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--sxc-grid-line);
+  white-space: nowrap;
+}
+.py-table tbody tr:hover td {
+  background: var(--sxc-hover);
+}
+.py-table tfoot td {
+  font-weight: 600;
+  border-top: 1px solid var(--sx-border-strong);
+  border-bottom: 0;
+  background: #f8fafc;
+}
+.py-gridwrap > .py-table {
+  align-self: stretch;
+}
+.py-review .py-gridwrap {
+  overflow: auto;
+  display: block;
+}
+
+/* ------------------------------------------------------------ confirmation */
+.py-done-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 980px;
+}
+.py-done-head {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 6px 2px 0;
+}
+.py-ok {
+  color: var(--sx-success);
+  flex: 0 0 auto;
+}
+.py-done-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+.py-done-counts {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: #334155;
+}
+.py-next-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+}
+.py-posting .py-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+.py-posting-bad {
+  border-color: #fecaca;
+}
+.py-posting-bad .py-panel-head {
+  background: #fef2f2;
+  color: var(--sx-danger);
+}
+.py-problems {
+  margin: 0;
+  padding-left: 18px;
+}
+.py-done-links {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------ choose schedule / employees */
+.py-choose-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 6px 2px;
+}
+.py-choose-head > svg {
+  margin-top: 2px;
+  color: var(--sx-accent);
+}
+.py-choose-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+.py-choose-date {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* ------------------------------------------------------------ selection table (CheckList) */
+.py-ct {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--sxc-border);
+  border-radius: 6px;
+  outline: none;
+  font-size: 13px;
+}
+.py-ct:focus-visible {
+  box-shadow: var(--sxc-ring);
+}
+.py-ct-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: grid;
+  background: var(--sxc-grid-head);
+  border-bottom: 1px solid var(--sxc-border);
+}
+.py-ct-hcell {
+  padding: 0 8px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--sxc-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+.py-ct-hcell:hover {
+  color: var(--sxc-text);
+}
+.py-ct-hcell.py-sorted {
+  color: var(--sxc-accent);
+}
+.py-ct-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.py-ct-check input {
+  margin: 0;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--sxc-accent);
+  pointer-events: none;
+}
+.py-ct-head .py-ct-check input {
+  pointer-events: auto;
+}
+.py-ct-row {
+  display: grid;
+  align-items: center;
+  height: 30px;
+  border-bottom: 1px solid var(--sxc-grid-line);
+  user-select: none;
+}
+.py-ct-row:hover {
+  background: var(--sxc-hover);
+}
+.py-ct-row.py-on {
+  background: #f0f7ff;
+}
+.py-ct-row.py-hi {
+  box-shadow: inset 3px 0 0 var(--sxc-accent);
+  background: var(--sxc-sel-row);
+}
+.py-ct-cell {
+  padding: 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+.py-ct-empty {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--sxc-muted);
+}
+
+/* ------------------------------------------------------------ Paycheck Details */
+.py-detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  background: var(--sx-form-bg);
+}
+.py-detail-dlg {
+  height: min(780px, calc(100vh - 110px));
+}
+.py-detail-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+}
+.py-detail-head {
+  display: flex;
+  align-items: center;
+  gap: 8px 14px;
+  flex-wrap: wrap;
+}
+.py-detail-emp {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--sx-form-title, var(--sx-text));
+  margin-right: auto;
+}
+.py-detail-period,
+.py-detail-check,
+.py-detail-class {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.py-detail-check .py-ro {
+  min-width: 96px;
+}
+.py-dash {
+  color: var(--sx-text-muted);
+}
+.py-detail-banner {
+  margin: 0;
+}
+.py-detail-earn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 10px;
+}
+.py-earn-panel .sx-grid {
+  min-height: 140px;
+}
+.py-totalsline {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  padding: 6px 12px;
+  border-top: 1px solid var(--sx-border);
+  font-weight: 600;
+}
+.py-totals-label {
+  margin-right: auto;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--sx-label);
+  align-self: center;
+}
+.py-pto {
+  padding: 10px 12px;
+  gap: 10px;
+  justify-content: space-between;
+}
+.py-pto dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 10px;
+  margin: 0;
+}
+.py-pto dt {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--sx-label);
+}
+.py-pto dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.py-detail-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+.py-detail-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.py-detail-right .sx-grid {
+  flex: 1 1 auto;
+}
+.py-sumname {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.py-man-icon {
+  color: #b45309;
+}
+.py-man {
+  color: #b45309;
+  font-weight: 600;
+}
+.py-checkamount {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--sx-border-strong);
+  font-size: 14px;
+  font-weight: 600;
+}
+.py-howlink {
+  font-size: 12px;
+  font-weight: 400;
+}
+.py-detail-foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-top: 1px solid var(--sx-border);
+}
+.py-calcstate {
+  min-width: 0;
+  color: var(--sx-text-muted);
+  font-size: 12px;
+}
+.py-detail-win {
+  height: 100%;
+  min-height: 0;
+}
+
+/* ------------------------------------------------------------ void dialog */
+.py-void-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 400px;
+}
+.py-void-note {
+  color: var(--sx-text-muted);
+  line-height: 1.45;
+}
+.py-void-label {
+  margin-top: 2px;
+}
+
+/* ------------------------------------------------------------ print preview */
+.py-preview {
+  display: flex;
+  flex-direction: column;
+}
+.py-preview-frame {
+  width: 100%;
+  height: min(70vh, 760px);
+  border: 0;
+  border-top: 1px solid var(--sx-border);
+  border-bottom: 1px solid var(--sx-border);
+  background: #e2e8f0;
+}
+
+/* ------------------------------------------------------------ Paycheck window */
+.py-pcsum {
+  flex: 0 0 auto;
+}
+/* the Paycheck window scrolls as a whole: the summary keeps its height */
+.sx-txnform-lines:has(> .py-pcsum) {
+  flex: 0 0 auto;
+}
+.py-pcsum-body {
+  display: grid;
+  grid-template-columns: 210px 300px minmax(0, 1fr);
+  gap: 18px;
+  padding: 12px;
+  align-items: start;
+}
+.py-pcsum-amounts,
+.py-pcsum-info {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 14px;
+  margin: 0;
+}
+.py-pcsum-amounts dt,
+.py-pcsum-info dt {
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--sx-label);
+}
+.py-pcsum-amounts dd,
+.py-pcsum-info dd {
+  white-space: nowrap;
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.py-pcsum-lines td,
+.py-pcsum-lines th {
+  height: 26px;
+}
+.py-man-flag {
+  color: #b45309;
+}
+.py-ytdnote {
+  max-width: 820px;
+  padding: 12px 14px;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  background: var(--sx-accent-soft);
+  line-height: 1.5;
+}
+.py-sync {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  background: #fff;
+}
+.py-sync .sx-label {
+  margin: 0;
+  white-space: nowrap;
+}
+.py-sync > svg,
+.py-sync > .sx-label,
+.py-sync > .sx-pill,
+.py-sync > button {
+  flex: 0 0 auto;
+}
+.py-sync-danger {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+.py-sync-warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+.py-sync-detail {
+  flex: 1 1 auto;
+  color: #334155;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------ Find and Edit Paychecks */
+.py-important {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 12px;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  background: #fffbeb;
+  line-height: 1.45;
+}
+.py-important svg {
+  flex: 0 0 auto;
+  color: #d97706;
+  margin-top: 2px;
+}
+.py-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px 10px;
+  flex-wrap: wrap;
+}
+.py-filters .sx-label {
+  margin: 0;
+}
+.py-infopanel {
+  padding: 8px 12px;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  background: var(--sx-bg-panel);
+  line-height: 1.45;
+  min-height: 52px;
+}
+.py-infopanel-head {
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------ Print Paychecks / Pay Stubs */
+.py-print-top {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 4px 0 2px;
+}
+.py-print-show {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.py-print-show .sx-label {
+  margin: 0;
+}
+.py-print-bal {
+  padding-bottom: 6px;
+  white-space: nowrap;
+}
+.py-print-intro {
+  margin: 0;
+  color: var(--sx-text-muted);
+}
+.py-print-msg .sx-textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+/* ------------------------------------------------------------ Enter Year-to-Date Amounts wizard */
+.py-wizard {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: #fff;
+}
+.py-wiz-rail {
+  flex: 0 0 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 16px 10px;
+  background: #f8fafc;
+  border-right: 1px solid var(--sx-border);
+}
+.py-wiz-railtitle {
+  padding: 0 8px 10px;
+  font-weight: 600;
+}
+.py-wiz-railfoot {
+  margin-top: auto;
+  padding: 0 8px;
+  line-height: 1.45;
+}
+.py-wiz-step {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 34px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font: inherit;
+  color: #475569;
+  text-align: left;
+  cursor: pointer;
+}
+.py-wiz-step:hover:not(:disabled) {
+  background: #eef2f6;
+}
+.py-wiz-step:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.py-wiz-step.py-on {
+  background: #fff;
+  color: var(--sx-accent);
+  font-weight: 600;
+  box-shadow: var(--sx-shadow-sm);
+}
+.py-wiz-num {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e5e9ef;
+  color: #475569;
+  flex: 0 0 auto;
+}
+.py-wiz-step.py-on .py-wiz-num {
+  background: var(--sx-accent);
+  color: #fff;
+}
+.py-wiz-step.py-done .py-wiz-num {
+  background: #dcfce7;
+  color: #15803d;
+}
+.py-wiz-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.py-wiz-main > .py-foot {
+  margin: 0;
+}
+.py-wiz-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.py-wiz-head h2 {
+  margin: 0 0 3px;
+  font-size: 17px;
+  font-weight: 600;
+}
+.py-wiz-headrow {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+}
+.py-wiz-headrow > div:first-child {
+  flex: 1 1 auto;
+}
+.py-wiz-year {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.py-wiz-list {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+.py-wiz-list-wrap {
+  flex: 1 1 260px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+.py-wiz-list-wrap > .sx-lv {
+  flex: 1 1 auto;
+}
+.py-wiz-grid {
+  flex: 1 1 300px;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+}
+.py-wiz-grid > .sx-grid {
+  flex: 1 1 auto;
+}
+.py-ytd-totals {
+  flex: 0 0 auto;
+}
+.py-cellro {
+  padding: 0 6px;
+  line-height: 26px;
+}

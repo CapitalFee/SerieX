@@ -1,0 +1,454 @@
+/* Payroll tax screens (Pay Payroll Taxes, Tax Payment, Adjust Tax Balances, Earlier Tax
+   Payments, Tax Payment Schedule). Same look as the SerieX Books Pay Bills / Pay Sales
+   Tax windows and check forms; only the SerieX Books design tokens are used. Prefix "lx-". */
+
+/* ---------------------------------------------------------------- list pages */
+.lx-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px 12px;
+  background: var(--sx-form-bg);
+  min-height: 0;
+  overflow: auto;
+}
+.lx-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+}
+.lx-cap {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sx-label);
+}
+.lx-flabel {
+  color: var(--sx-label);
+}
+.lx-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--sx-border-strong);
+  margin: 0 4px;
+}
+.lx-spacer {
+  flex: 1 1 auto;
+}
+.lx-grid {
+  position: relative;
+  flex: 1 1 200px;
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+}
+.lx-grid > .sx-grid,
+.lx-grid > .sx-lv {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.lx-grid > .sx-empty {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+}
+.sx-grid-row.lx-row-sel td {
+  background: #f1f6ff;
+}
+.sx-grid-row.lx-row-paid td,
+.lx-row-paid .sx-grid-text {
+  color: var(--sx-text-muted);
+}
+.lx-payment {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.lx-warn-ico {
+  color: var(--sx-warning);
+  flex: none;
+}
+.lx-totals {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lx-tot {
+  display: grid;
+  grid-template-columns: auto 110px 116px;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.lx-tot > span {
+  padding: 0 8px;
+}
+.lx-tot > span:first-child {
+  font-weight: 600;
+  color: var(--sx-label);
+}
+.lx-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+.lx-panel {
+  background: var(--sx-bg-panel);
+  border: 1px solid var(--sx-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.lx-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--sx-border);
+  font-weight: 600;
+}
+.lx-panel-body {
+  padding: 10px 12px;
+}
+.lx-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: flex-start;
+}
+/* both bottom panels keep one height, so the grid does not move when a row is highlighted */
+.lx-bottom .lx-panel-body {
+  height: 172px;
+  overflow: auto;
+}
+.lx-detail-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.lx-items-wrap {
+  max-height: 150px;
+  overflow: auto;
+}
+.lx-paybody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: flex-start;
+}
+.lx-checkopts {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding-top: 2px;
+}
+.lx-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--sx-border);
+}
+.lx-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  margin: 0;
+  font-size: 12.5px;
+}
+.lx-info dt {
+  color: var(--sx-text-muted);
+}
+.lx-info dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.lx-items {
+  border-collapse: collapse;
+  font-size: 12.5px;
+  min-width: 240px;
+}
+.lx-items th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--sx-label);
+  text-align: left;
+  padding: 2px 8px 4px 0;
+  border-bottom: 1px solid var(--sx-border);
+}
+.lx-items td {
+  padding: 3px 8px 3px 0;
+  border-bottom: 1px solid var(--sx-grid-line);
+}
+.lx-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+th.lx-num {
+  text-align: right;
+}
+.lx-strong {
+  font-weight: 600;
+}
+.lx-muted {
+  color: var(--sx-text-muted);
+}
+.lx-danger {
+  color: var(--sx-danger);
+}
+
+/* notes and banners */
+.lx-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--sx-accent-soft);
+  color: #1e3a8a;
+  border: 1px solid #c7d7fe;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.lx-note.lx-warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.lx-note.lx-ok {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+.lx-note .sx-linkbtn {
+  margin-left: auto;
+  white-space: nowrap;
+}
+.lx-banner {
+  margin: 0;
+}
+
+/* dialogs (showDialog boxes have no padding) */
+.lx-dlg {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 360px;
+  padding: 14px 16px 0;
+}
+.lx-dlg > .sx-dlg-buttons {
+  margin: 4px -16px 0;
+}
+.lx-ctable-wrap {
+  position: relative;
+  overflow: auto;
+  max-height: 320px;
+  border: 1px solid var(--sx-border);
+  border-radius: 6px;
+  background: #fff;
+}
+.lx-ctable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.lx-ctable th {
+  position: sticky;
+  top: 0;
+  background: var(--sx-grid-header);
+  border-bottom: 1px solid var(--sx-border);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--sx-label);
+  padding: 6px 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+.lx-ctable td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--sx-grid-line);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+}
+.lx-summary tbody tr {
+  cursor: pointer;
+}
+.lx-summary tbody tr:hover {
+  background: var(--sx-report-hover);
+}
+.lx-summary tfoot td {
+  border-top: 1px solid var(--sx-border-strong);
+  border-bottom: none;
+}
+
+/* ------------------------------------------------------------- record forms */
+.lx-titleright {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+}
+.lx-batch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  background: var(--sx-accent-soft);
+  color: var(--sx-accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.lx-readval {
+  display: inline-block;
+  min-width: 120px;
+  height: 28px;
+  line-height: 28px;
+  padding: 0 2px;
+  font-weight: 500;
+}
+.lx-cf-extra {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  max-width: 900px;
+  padding: 2px 4px;
+}
+.lx-period,
+.lx-method {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lx-prior-note {
+  max-width: 520px;
+  line-height: 1.4;
+}
+.lx-linetabs {
+  height: 100%;
+}
+.lx-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  width: 100%;
+}
+.lx-created {
+  margin-left: auto;
+  font-size: 12px;
+}
+.lx-sync {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  font-size: 12.5px;
+}
+.lx-sync-ok {
+  color: var(--sx-success);
+}
+.lx-sync-ok .lx-muted {
+  color: var(--sx-text-muted);
+}
+.lx-sync-err {
+  color: var(--sx-danger);
+}
+.lx-sync-wait {
+  color: var(--sx-warning);
+}
+.lx-sync-none {
+  color: var(--sx-text-muted);
+}
+.lx-sync-msg {
+  max-width: 640px;
+}
+
+/* -------------------------------------------------------- adjustment form */
+.lx-adj-for {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 28px;
+}
+.lx-adj-for .sx-radiogroup {
+  flex: none;
+}
+.lx-affect {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lx-help {
+  max-width: 760px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--sx-text-muted);
+}
+
+/* -------------------------------------------------- tax payment schedule dialog */
+.lx-sched {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.lx-sched-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--sx-form-title);
+}
+.lx-sched-help {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--sx-panel-bg);
+  border: 1px solid var(--sx-border);
+  color: var(--sx-text-muted);
+  line-height: 1.45;
+}
+.lx-sched-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.lx-chip {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--sx-grid-header);
+  border: 1px solid var(--sx-border);
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------- earlier tax payments */
+.lx-prior {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(150px, 1fr) auto;
+  gap: 10px;
+}
+.lx-prior-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lx-prior-form .sx-grid {
+  height: 190px;
+}
+.lx-prior-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: flex-start;
+}
