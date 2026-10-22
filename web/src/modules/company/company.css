@@ -292,7 +292,7 @@ kbd.cx-kbd {
 
 /* ------------------------------------------------------------------ welcome (no company open) */
 .cx-welcome {
-  width: 880px;
+  width: 1060px;
   max-width: 100%;
   max-height: 100%;
   display: flex;
@@ -317,7 +317,7 @@ kbd.cx-kbd {
 }
 .cx-welcome-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 18px;
 }
@@ -1969,4 +1969,30 @@ kbd.cx-kbd {
   margin: 0;
   padding: 0;
   min-width: 0;
+}
+
+/* New Company wizard: the way to import books from QuickBooks Desktop instead of starting fresh */
+.cx-wiz-import {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 0 0 16px;
+  border: 1px solid #ddd6fe;
+  border-radius: 8px;
+  background: #f5f3ff;
+  color: var(--sx-text);
+  font-size: 13px;
+}
+.cx-wiz-import > svg {
+  flex: none;
+  color: #6d28d9;
+}
+.cx-wiz-import > span {
+  flex: 1;
+}
+@media (max-width: 900px) {
+  .cx-welcome-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

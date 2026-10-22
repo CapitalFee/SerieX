@@ -8,7 +8,7 @@
 // the Sales Tax Item (stored as the default sales tax), adds the accounts and their opening
 // balances, then opens the company on the Home page (which shows a getting-started list).
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Building2, Check, CreditCard, Landmark, ListChecks, MapPin, Percent, Plus, ShieldAlert, ShieldCheck, Trash2 } from 'lucide-react';
+import { Building2, Check, CreditCard, FolderInput, Landmark, ListChecks, MapPin, Percent, Plus, ShieldAlert, ShieldCheck, Trash2 } from 'lucide-react';
 import { api } from '@/api/client';
 import type { Account, AccountType, CompanyFile, IndustryTemplate, Item, Name, NewCompanyRequest, Prefs, Txn } from '@/api/types';
 import { emptyLine, emptyTxn } from '@/api/types';
@@ -32,6 +32,7 @@ import {
   toast,
   useFormErrors,
 } from '@/components';
+import { openWindow } from '@/windows/windowStore';
 import { useOptionalWindow } from '@/windows/WindowContext';
 import { switchCompany, type CompanySession } from '@/state/session';
 import { todayIso } from '@/util/dates';
@@ -415,6 +416,20 @@ export default function NewCompanyWizard(_props: NewCompanyWizardProps) {
               {k === 'business' && (
                 <>
                   <WizHead title="Tell us about your business" sub="We use your industry to set up a chart of accounts that fits." />
+                  <div className="cx-wiz-import">
+                    <FolderInput size={16} aria-hidden="true" />
+                    <span>
+                      <b>Moving from QuickBooks® Desktop?</b> Import your books instead: your accounts, customers, vendors, items and history come with you.
+                    </span>
+                    <Button
+                      size="sm"
+                      label="Import from QuickBooks®"
+                      onClick={() => {
+                        openWindow('qbImport', { target: 'new' });
+                        void win?.close();
+                      }}
+                    />
+                  </div>
                   <Field label="Company name" required hint="The name your customers know you by." width={380}>
                     <TextField name="name" value={req.name} onChange={(v) => set({ name: v })} autoFocus placeholder="e.g. Bayview Landscaping" />
                   </Field>

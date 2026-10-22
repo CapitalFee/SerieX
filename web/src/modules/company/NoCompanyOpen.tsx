@@ -188,12 +188,14 @@ export default function NoCompanyOpen({ onOpened }: NoCompanyOpenProps) {
             <span>{sampleBusy ? 'Creating the sample company...' : 'A landscaping business with 18 months of activity to try things safely.'}</span>
           </span>
         </button>
-      </div>
-      <div className="cx-muted" style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '-6px 0 16px' }}>
-        <FolderInput size={15} />
-        Moving from QuickBooks® Desktop?
-        <button type="button" className="sx-linkbtn" onClick={() => openWindow('qbImport', { target: 'new' })}>
-          Import your books
+        <button type="button" className="cx-action-card" onClick={() => openWindow('qbImport', { target: 'new' })}>
+          <span className="cx-action-icon" style={{ background: '#ede9fe', color: '#6d28d9' }}>
+            <FolderInput size={20} />
+          </span>
+          <span className="cx-action-text">
+            <b>Import from QuickBooks®</b>
+            <span>Moving from QuickBooks® Desktop? Bring your accounts, customers, vendors and history.</span>
+          </span>
         </button>
       </div>
 
