@@ -2,7 +2,7 @@
 // Start page: create a company, open or restore one,
 // open the sample company, and the list of company files with Open / Remove from list.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArchiveRestore, Building2, FolderInput, FolderOpen, Plus, Sparkles, X } from 'lucide-react';
+import { ArchiveRestore, Building2, FolderInput, FolderOpen, Plus, Sparkles, Trash2, X } from 'lucide-react';
 import { api } from '@/api/client';
 import type { CompanyFile } from '@/api/types';
 import { Badge, Button, EmptyState, SearchBox, Spinner, confirmBox, toast } from '@/components';
@@ -10,6 +10,7 @@ import { openWindow } from '@/windows/windowStore';
 import { getLastCompanyId, getRecentCompanies, forgetRecentCompany } from '@/state/session';
 import { queryClient } from '@/api/hooks';
 import { fmtBytes, fmtDateTime, timeAgo, useCompanyFiles } from './shared';
+import { deleteCompanyFile } from './DeleteCompanyDialog';
 import './company.css';
 
 export interface NoCompanyOpenProps {
@@ -277,6 +278,15 @@ export default function NoCompanyOpen({ onOpened }: NoCompanyOpenProps) {
                       onClick={() => removeFromList(c)}
                     >
                       <X size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="sx-iconbtn cx-rowx"
+                      title="Delete the company file from this computer"
+                      aria-label={`Delete the company file of ${c.name}`}
+                      onClick={() => void deleteCompanyFile(c)}
+                    >
+                      <Trash2 size={14} />
                     </button>
                   </td>
                 </tr>

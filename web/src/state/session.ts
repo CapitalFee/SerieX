@@ -53,7 +53,8 @@ export interface SessionState {
    * asking for the password; the Log in box still shows when the server refuses it.
    */
   openCompany(id: string, session?: CompanySession): Promise<void>;
-  closeCompany(): void;
+  /** Closes the open company. `deleted`: its file was just deleted (no backup on close, no logout). */
+  closeCompany(opts?: { deleted?: boolean }): void;
   reloadCompany(): Promise<void>;
 }
 
@@ -269,16 +270,17 @@ export const useSession = create<SessionState>((set, get) => ({
     }
   },
 
-  closeCompany() {
+  closeCompany(opts) {
     const { companyId } = get();
+    const deleted = !!opts?.deleted;
     forceCloseAllWindows();
     // The server backs up the file when it changed since its last backup (in the background);
     // sent before the logout below, which ends the session the request needs.
-    const backedUp = companyId ? api.post('/backups/close', {}, { noPrompt: true, quiet: true }).catch(() => undefined) : Promise.resolve();
+    const backedUp = companyId && !deleted ? api.post('/backups/close', {}, { noPrompt: true, quiet: true }).catch(() => undefined) : Promise.resolve();
     if (companyId && savedToken(companyId)) {
       // Tell the server the session ended (ignore errors), and forget it.
       const token = getSessionToken();
-      if (token) void backedUp.then(() => endSession(companyId, token));
+      if (token && !deleted) void backedUp.then(() => endSession(companyId, token));
       saveToken(null, null, '');
     }
     // A session saved for another company file is kept: the New Company wizard logs in to the

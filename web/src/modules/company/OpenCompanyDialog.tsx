@@ -1,6 +1,6 @@
 // Open Company or Backup (File menu): open a company file from the list, restore an automatic backup
 // (as a new company file or in place of the current data) or a backup file (.sxb) as a new
-// company file, or delete a company file for good.
+// company file, or delete a company file for good (DeleteCompanyDialog).
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArchiveRestore, FolderOpen, History, Trash2, UploadCloud } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -26,7 +26,8 @@ import {
   type ListColumn,
 } from '@/components';
 import { useOptionalWindow } from '@/windows/WindowContext';
-import { forgetRecentCompany, getLastCompanyId, switchCompany, useSession } from '@/state/session';
+import { getLastCompanyId, switchCompany, useSession } from '@/state/session';
+import { deleteCompanyFile } from './DeleteCompanyDialog';
 import { closeAllWindows } from '@/windows/windowStore';
 import { backupKindLabel, fmtBytes, fmtDateTime, useCompanyFiles } from './shared';
 import './company.css';
@@ -91,34 +92,7 @@ function OpenPane({ onOpen, onClose }: { onOpen: (id: string) => void; onClose: 
   const selected = rows.find((r) => r.id === sel) ?? null;
 
   const del = async (c: CompanyFile) => {
-    if (c.id === current) {
-      await msgBox({
-        title: 'Delete Company File',
-        icon: 'warning',
-        message: `"${c.name}" is open right now. Close the company (File > Close Company) before deleting its file.`,
-      });
-      return;
-    }
-    const ok = await confirmBox(
-      `Delete the company file "${c.name}" (${c.fileName})?\n\nAll of its data is removed from this computer for good. Make a backup first if you might need it again.`,
-      'Delete Company File',
-    );
-    if (!ok) return;
-    const typed = await promptBox(`To confirm, type the word DELETE.`, { title: 'Delete Company File' });
-    if (typed === null) return;
-    if (typed.trim().toUpperCase() !== 'DELETE') {
-      await msgBox({ title: 'Delete Company File', icon: 'info', message: 'The company file was not deleted.' });
-      return;
-    }
-    try {
-      await api.global.del(`/companies/${encodeURIComponent(c.id)}`, { noPrompt: true });
-      forgetRecentCompany(c.id);
-      await queryClient.invalidateQueries({ queryKey: ['global', 'companies'] });
-      setSel(null);
-      toast(`Company file "${c.name}" deleted`, { kind: 'info' });
-    } catch (e) {
-      await msgBox({ title: 'Delete Company File', icon: 'error', message: (e as Error).message });
-    }
+    if (await deleteCompanyFile(c)) setSel(null);
   };
 
   // The fixed widths add up to 574px, so the list fits the dialog's 596px list area even with a

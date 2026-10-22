@@ -208,9 +208,12 @@ DELETE). Permanently removes the company file -> `204`. Its automatic backup fol
 
 - No passwords in the file: anyone may delete.
 - With passwords: an administrator's `X-Session`, or body `{"user":"Admin","password":"..."}` of
-  an administrator. Otherwise `403 forbidden` (`field: "password"`) "This company file is
-  protected by passwords. Only its administrator can delete it...". Wrong password:
-  `400 validation`.
+  an administrator. The open company can be deleted with the session of the administrator
+  logged in to it. Otherwise `403 forbidden` (`field: "password"`) "This company file has
+  passwords. Only an administrator can delete it...". A user who is not an administrator:
+  `403 forbidden` (`field: "user"`). Wrong password: `400 validation`.
+- In the app: File > Utilities > Delete Company File (the open company), the trash button of the
+  welcome list, or Delete file in File > Open or Restore Company.
 
 Deleting cannot be undone from SerieX (only from a backup). Do it only when the user clearly
 asked for that file to be deleted, after naming the file and suggesting a backup download first.

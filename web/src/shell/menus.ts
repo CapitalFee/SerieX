@@ -12,11 +12,12 @@ import {
   sendMenuCommand,
   type WinState,
 } from '@/windows/windowStore';
-import { switchCompany, requestCloseCompany, type RecentCompany } from '@/state/session';
+import { switchCompany, requestCloseCompany, useSession, type RecentCompany } from '@/state/session';
 import { useView, type IconBarMode, type WindowMode, type IconBarTab } from '@/state/view';
 import { reportsByCategory } from '@/state/catalog';
 import { toast } from '@/components/toast';
 import { backUpNow } from '@/modules/company/shared';
+import { deleteCompanyFile } from '@/modules/company/DeleteCompanyDialog';
 import { switchToPayroll } from './AppSwitcher';
 import type { ReportInfo } from '@/api/types';
 
@@ -109,6 +110,13 @@ async function backUpNowFromMenu(): Promise<void> {
     toast(`The backup could not be made. ${(err as Error).message}`, { kind: 'error', duration: 8000 });
   }
 }
+/** File > Utilities > Delete Company File: deletes the company file that is open. */
+function deleteOpenCompany(): void {
+  const s = useSession.getState();
+  if (!s.companyId) return;
+  const name = s.company?.name || s.companyId;
+  void deleteCompanyFile({ id: s.companyId, name, fileName: s.companyId + '.sxb' });
+}
 /** Window kinds that answer Ctrl+Q with the activity report of the selected account, name or item. */
 const QUICKREPORT_KINDS: WinState['kind'][] = ['customerCenter', 'vendorCenter', 'chartOfAccounts', 'itemList', 'otherNames', 'register'];
 /** Transaction forms: they answer Ctrl+H (Transaction History) and Ctrl+Y (Transaction Journal). */
@@ -181,6 +189,8 @@ export function buildMenus(ctx: MenuContext): TopMenu[] {
           SEP,
           { label: '&Check Company File', action: open('verifyData') },
           { label: 'Re&pair Company File', action: open('verifyData', { rebuild: true }) },
+          SEP,
+          { label: '&Delete Company File...', action: deleteOpenCompany },
         ],
       }),
       SEP,

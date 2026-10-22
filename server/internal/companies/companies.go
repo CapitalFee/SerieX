@@ -76,7 +76,7 @@ func Register(rt *httpx.Router, mgr *store.Manager) {
 			return err
 		}
 		if err := RequireFileAccess(rt, mgr, r, id, true, &creds,
-			"This company file is protected by passwords. Only its administrator can delete it: enter the administrator's user name and password."); err != nil {
+			"This company file has passwords. Only an administrator can delete it: enter the user name and password of an administrator of this file, or open the company, log in as an administrator and choose File > Utilities > Delete Company File."); err != nil {
 			return err
 		}
 		fileMu.Lock()
@@ -185,10 +185,16 @@ func RequireFileAccess(rt *httpx.Router, mgr *store.Manager, r *http.Request, id
 		if li.Admin || !admin {
 			return nil
 		}
-		return apperr.Forbidden("%s", orMsg(adminMsg, "Only an administrator of this company file can do this."))
+		e := apperr.Forbidden("%s is not an administrator of this company file. Enter the user name and password of an administrator.", li.User)
+		e.Field = "user"
+		return e
 	}
 	if admin {
-		e := apperr.Forbidden("%s", orMsg(adminMsg, "Only an administrator of this company file can do this."))
+		msg := orMsg(adminMsg, "Only an administrator of this company file can do this.")
+		if si.User != "" {
+			msg = fmt.Sprintf("%s, the user logged in, is not an administrator of this company file. Enter the user name and password of an administrator.", si.User)
+		}
+		e := apperr.Forbidden("%s", msg)
 		e.Field = "password"
 		return e
 	}
