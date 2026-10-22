@@ -537,6 +537,7 @@ func (im *importer) importAccounts() error {
 		acct := model.Account{Name: a.newName, Type: r.Type, ParentID: ptr(parent), Number: r.Number, Active: true}
 		if a.src != nil {
 			acct.Description, acct.BankAcctNumber, acct.Active = a.src.Desc, a.src.BankNum, !a.src.Hidden
+			acct.RoutingNumber = a.src.Routing
 		}
 		var id int64
 		uerr, ferr := im.try(func() error {

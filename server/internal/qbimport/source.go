@@ -1,6 +1,7 @@
 package qbimport
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -72,14 +73,14 @@ func itemTypeOf(code string) string {
 var listKinds = map[string]string{
 	"CLASS": model.ListClass, "TERMS": model.ListTerms, "PAYMETH": model.ListPaymentMethod, "SHIPMETH": model.ListShipVia,
 	"CTYPE": model.ListCustomerType, "VTYPE": model.ListVendorType, "JOBTYPE": model.ListJobType,
-	"CUSTMSG": model.ListCustomerMessage, "SALESREP": model.ListSalesRep,
+	"CUSTMSG": model.ListCustomerMessage, "INVMEMO": model.ListCustomerMessage, "SALESREP": model.ListSalesRep,
 }
 
 // sectionLabels names the IIF row kinds for people.
 var sectionLabels = map[string]string{
 	"ACCNT": "Accounts", "CUST": "Customers and jobs", "VEND": "Vendors", "OTHERNAME": "Other names", "EMP": "Employees",
 	"INVITEM": "Items", "CLASS": "Classes", "TERMS": "Terms", "PAYMETH": "Payment methods", "SHIPMETH": "Shipping methods",
-	"CTYPE": "Customer types", "VTYPE": "Vendor types", "JOBTYPE": "Job types", "CUSTMSG": "Customer messages",
+	"CTYPE": "Customer types", "VTYPE": "Vendor types", "JOBTYPE": "Job types", "CUSTMSG": "Customer messages", "INVMEMO": "Customer messages",
 	"SALESREP": "Sales reps", "TRNS": "Transactions",
 }
 
@@ -118,6 +119,7 @@ type srcAccount struct {
 	RawType, Type         string
 	Special               string
 	Number, Desc, BankNum string
+	Routing               string // from the online banking settings (QB ONLINE rows)
 	Hidden                bool
 	OBAmount              int64
 }
@@ -249,6 +251,18 @@ func readSource(f *iifFile) *source {
 	errAt := func(line int, msg string) {
 		s.problems = append(s.problems, Problem{File: "iif", Line: line, Level: levelError, Message: msg})
 	}
+	// custom field labels of names (CUSTNAMEDICT: INDEX 0 = CUSTFLD1)
+	nameFields := map[int]string{}
+	for _, r := range f.Rows {
+		if r.Kind == "CUSTNAMEDICT" {
+			if i, err := strconv.Atoi(strings.TrimSpace(r.get("INDEX"))); err == nil && strings.TrimSpace(r.get("LABEL")) != "" {
+				nameFields[i] = strings.TrimSpace(r.get("LABEL"))
+			}
+		}
+	}
+	type online struct{ accnt, routing, number string }
+	var onlines []online
+	itemFieldValues := 0
 	for _, r := range f.Rows {
 		switch r.Kind {
 		case "ACCNT":
@@ -291,6 +305,15 @@ func readSource(f *iifFile) *source {
 			}
 			m.AccountNumber = r.get("ACCNUM")
 			m.Active = !n.Hidden
+			for i := 1; i <= 15; i++ {
+				if v := strings.TrimSpace(r.get("CUSTFLD" + strconv.Itoa(i))); v != "" {
+					label := nameFields[i-1]
+					if label == "" {
+						label = "Custom field " + strconv.Itoa(i)
+					}
+					m.Notes = strings.TrimSpace(m.Notes + "\n" + label + ": " + v)
+				}
+			}
 			switch r.Kind {
 			case "CUST":
 				n.Kind = model.NameCustomer
@@ -356,7 +379,24 @@ func readSource(f *iifFile) *source {
 				it.Qty = &v
 			}
 			it.Purchased = it.COGSAccnt != "" || it.PurchDesc != "" || it.Cost != 0 || yes(r.get("ISPASSEDTHRU"))
+			for i := 1; i <= 15; i++ {
+				if strings.TrimSpace(r.get("CUSTFLD"+strconv.Itoa(i))) != "" {
+					itemFieldValues++
+					break
+				}
+			}
 			s.items = append(s.items, it)
+		case "CUSTNAMEDICT", "ENDCUSTNAMEDICT", "CUSTITEMDICT", "ENDCUSTITEMDICT":
+			// custom field labels: name values go to the notes (above)
+		case "SALESTAXCODE":
+			// customers and items are taxable or not; only codes beyond Tax / Non lose something
+			if code := strings.ToUpper(strings.TrimSpace(r.get("CODE"))); code != "" && code != "TAX" && code != "NON" {
+				s.problems = append(s.problems, Problem{File: "iif", Line: r.Line, Level: levelNote,
+					Message: fmt.Sprintf("The sales tax code %s (%s) is not imported: SerieX Books marks customers and items as taxable or not taxable.", r.get("CODE"), r.get("DESC"))})
+			}
+		case "QB ONLINE":
+			// online banking settings: routing and account numbers go to the bank account
+			onlines = append(onlines, online{strings.Join(splitFull(r.get("ACCNT")), ":"), r.get("ROUTNUM"), r.get("OLACCNT")})
 		default:
 			list, ok := listKinds[r.Kind]
 			if !ok {
@@ -402,6 +442,23 @@ func readSource(f *iifFile) *source {
 			}
 			s.lists = append(s.lists, e)
 		}
+	}
+	for _, o := range onlines {
+		for _, a := range s.accounts {
+			if normFull(a.Full) != normFull(o.accnt) {
+				continue
+			}
+			if a.BankNum == "" {
+				a.BankNum = strings.TrimSpace(o.number)
+			}
+			if rt := strings.TrimSpace(o.routing); strings.Trim(rt, "0") != "" {
+				a.Routing = rt
+			}
+		}
+	}
+	if itemFieldValues > 0 {
+		s.problems = append(s.problems, Problem{File: "iif", Level: levelNote,
+			Message: fmt.Sprintf("%d items have custom field values; SerieX Books items have no custom fields, so those values are not imported.", itemFieldValues)})
 	}
 	return s
 }
