@@ -8,7 +8,7 @@ import (
 )
 
 // AppVersion is reported by GET /api/info.
-const AppVersion = "2026.10.4"
+const AppVersion = "2026.10.5"
 
 // stateNames are the 50 states and DC (payroll work states).
 var stateNames = map[string]string{
